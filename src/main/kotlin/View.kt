@@ -27,8 +27,6 @@ class MyFirstChart: Application() {
         gc.drawImage(image, 0.0, 0.0)
 
         stage.icons.add(Image(FileInputStream("src/main/1.png")))
-        val i = Image(FileInputStream("src/main/1.png"))
-        gc.drawImage(i, 0.0, 0.0)
 
         stage.show()
     }
