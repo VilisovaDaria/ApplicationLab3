@@ -47,7 +47,6 @@ class MyFirstChart: Application() {
 }
 
 fun getCoordinates(): Map<Double, Pair<Double, Double>> {
-    val x = 0
     val result = mutableMapOf<Double, Pair<Double, Double>>()
     val coefficientsFirst = listOf(1 to 1, 2 to 3, 3 to 5, 4 to 7)
     val coefficientsSecond = listOf(2 to 2, 3 to 4, 4 to 6, 5 to 8)
@@ -64,6 +63,3 @@ fun getCoordinates(): Map<Double, Pair<Double, Double>> {
     }
     return result.toSortedMap()
 }
-
-
-//111111111111111111111111
