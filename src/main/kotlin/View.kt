@@ -28,11 +28,11 @@ class MyFirstChart : Application() {
 
 
         fun drawChess() {
-            val blackChess = Color.BLACK.getImage()
-            val whiteChess = Color.WHITE.getImage()
+            val blackChess = Colour.BLACK.getImage()
+            val whiteChess = Colour.WHITE.getImage()
 
 
-            for ((i, b) in drawChips()) {
+            for ((i, b) in coordinatesOfChips()) {
                 if (i < 4.0) {
 
                     gc.drawImage(whiteChess, b.first, b.second)
@@ -45,10 +45,10 @@ class MyFirstChart : Application() {
 
 
         //Определяю цвет для шашки, если в ячейке нет шашки, то null
-        fun setColor(y: Int): Color? {
+        fun setColor(y: Int): Colour? {
             return when (y) {
-                in 0 until 3 -> Color.WHITE
-                in 5 until 8 -> Color.BLACK
+                in 0 until 3 -> Colour.WHITE
+                in 5 until 8 -> Colour.BLACK
                 else -> null
             }
         }
@@ -59,8 +59,7 @@ class MyFirstChart : Application() {
             for (x in 0 until 4) {
                 var array = arrayOf<Chess>()
                 for (y in 0 until 8) {
-                    val a = setColor(y)
-                    array += Chess(x, y, a)
+                    array += Chess(x, y, setColor(y))
                 }
                 board += array
             }
@@ -71,10 +70,20 @@ class MyFirstChart : Application() {
         drawChess()
         stage.show()
     }
-
 }
 
-fun drawChips(): Map<Double, Pair<Double, Double>> {
+fun canMove(board: Array<Array<Chess>>, chess: Chess): Boolean {
+    var (x, y) = chess.getCell()
+    if (chess.getColor() == Colour.WHITE) y -= 1
+    else if (chess.getColor() == Colour.BLACK) y += 1
+    else return false //если не будет шашки в клетке
+
+    if (y % 2 == 0) x -= 1
+
+    return board[x + 1][y].getColor() == null || board[x][y].getColor() == null
+}
+
+fun coordinatesOfChips(): Map<Double, Pair<Double, Double>> {
     val result = mutableMapOf<Double, Pair<Double, Double>>()
     val coefficient = listOf(1 to 1, 2 to 3, 3 to 5, 4 to 7)
 
