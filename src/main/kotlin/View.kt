@@ -1,10 +1,13 @@
 import javafx.application.Application
+import javafx.event.EventHandler
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.Image
+import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import java.io.FileInputStream
+
 
 fun main() {
     Application.launch(MyFirstChart::class.java)
@@ -13,10 +16,12 @@ fun main() {
 class MyFirstChart : Application() {
 
     override fun start(stage: Stage) {
-
+        stage.isResizable = false
         val root = Group()
         stage.scene = Scene(root)
         stage.title = "Русские шашки"
+
+        stage.scene.onMousePressed = EventHandler<MouseEvent> { event -> println("вот оно считывает клик на всю сцену" + event.source) }
 
         val canvasNew = Canvas(700.0, 700.0)
         root.children.add(canvasNew)
@@ -42,25 +47,6 @@ class MyFirstChart : Application() {
                 }
             }
         }
-
-
-//        fun drawChess() {
-//            val blackChess = Colour.BLACK.getImage()
-//            val whiteChess = Colour.WHITE.getImage()
-//
-//
-//            for ((i, b) in coordinatesOfChips()) {
-//                if (i < 4.0) {
-//
-//                    gc.drawImage(whiteChess, b.first, b.second)
-//                }
-//                if (i > 6.0) {
-//                    gc.drawImage(blackChess, b.first, b.second)
-//                }
-//            }
-//        }
-
-
 
         var board = fillBoard()
         draw(board)
@@ -100,18 +86,3 @@ fun canMove(board: Array<Array<Chess>>, chess: Chess): Boolean {
 
     return board[x + 1][y].getColor() == null || board[x][y].getColor() == null
 }
-
-
-//fun coordinatesOfChips(): Map<Double, Pair<Double, Double>> {
-//    val result = mutableMapOf<Double, Pair<Double, Double>>()
-//    val coefficient = listOf(1 to 1, 2 to 3, 3 to 5, 4 to 7)
-//
-//    for ((_, n) in coefficient) {
-//        for ((i, k) in coefficient) {
-//            result[n + (i.toDouble() / 10.0)] = (70 * k).toDouble() to 70.0 * n
-//            result[(n + 1) + ((i + 1).toDouble() / 10.0)] = (70 * (k + 1)).toDouble() to 70.0 * (n + 1)
-//        }
-//    }
-//
-//    return result.toSortedMap()
-//}
