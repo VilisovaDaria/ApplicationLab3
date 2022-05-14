@@ -26,22 +26,39 @@ class MyFirstChart : Application() {
         gc.drawImage(image, 0.0, 0.0)
 
 
+        fun draw(board: Array<Array<Chess>>) {
+            for (stroke in board) {
+                for (chip in stroke) {
+                    if (chip.getColor() != null) {
+                        var x1 = 1
+                        var (x, y) = chip.getCell()
+                        if (y % 2 == 1) x1 = 2
 
-        fun drawChess() {
-            val blackChess = Colour.BLACK.getImage()
-            val whiteChess = Colour.WHITE.getImage()
-
-
-            for ((i, b) in coordinatesOfChips()) {
-                if (i < 4.0) {
-
-                    gc.drawImage(whiteChess, b.first, b.second)
-                }
-                if (i > 6.0) {
-                    gc.drawImage(blackChess, b.first, b.second)
+                        val image = chip.getColor()!!.getImage()
+                        y = (y + 1) * 70
+                        x = 70 * (x * 2 + x1)
+                        gc.drawImage(image, x.toDouble(), y.toDouble())
+                    }
                 }
             }
         }
+
+
+//        fun drawChess() {
+//            val blackChess = Colour.BLACK.getImage()
+//            val whiteChess = Colour.WHITE.getImage()
+//
+//
+//            for ((i, b) in coordinatesOfChips()) {
+//                if (i < 4.0) {
+//
+//                    gc.drawImage(whiteChess, b.first, b.second)
+//                }
+//                if (i > 6.0) {
+//                    gc.drawImage(blackChess, b.first, b.second)
+//                }
+//            }
+//        }
 
 
         //Определяю цвет для шашки, если в ячейке нет шашки, то null
@@ -67,7 +84,7 @@ class MyFirstChart : Application() {
         }
 
         var board = fillBoard()
-        drawChess()
+        draw(board)
         stage.show()
     }
 }
@@ -83,16 +100,17 @@ fun canMove(board: Array<Array<Chess>>, chess: Chess): Boolean {
     return board[x + 1][y].getColor() == null || board[x][y].getColor() == null
 }
 
-fun coordinatesOfChips(): Map<Double, Pair<Double, Double>> {
-    val result = mutableMapOf<Double, Pair<Double, Double>>()
-    val coefficient = listOf(1 to 1, 2 to 3, 3 to 5, 4 to 7)
 
-    for ((_, n) in coefficient) {
-        for ((i, k) in coefficient) {
-            result[n + (i.toDouble() / 10.0)] = (70 * k).toDouble() to 70.0 * n
-            result[(n + 1) + ((i + 1).toDouble() / 10.0)] = (70 * (k + 1)).toDouble() to 70.0 * (n + 1)
-        }
-    }
-
-    return result.toSortedMap()
-}
+//fun coordinatesOfChips(): Map<Double, Pair<Double, Double>> {
+//    val result = mutableMapOf<Double, Pair<Double, Double>>()
+//    val coefficient = listOf(1 to 1, 2 to 3, 3 to 5, 4 to 7)
+//
+//    for ((_, n) in coefficient) {
+//        for ((i, k) in coefficient) {
+//            result[n + (i.toDouble() / 10.0)] = (70 * k).toDouble() to 70.0 * n
+//            result[(n + 1) + ((i + 1).toDouble() / 10.0)] = (70 * (k + 1)).toDouble() to 70.0 * (n + 1)
+//        }
+//    }
+//
+//    return result.toSortedMap()
+//}

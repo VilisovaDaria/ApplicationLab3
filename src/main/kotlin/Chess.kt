@@ -22,10 +22,10 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 //        return coordinatesOfChips().keys
 //    }
 
-    //получение координат
-    fun getXY(): Collection<Pair<Double, Double>> {
-        return coordinatesOfChips().values
-    }
+//    //получение координат
+//    fun getXY(): Collection<Pair<Double, Double>> {
+//        return coordinatesOfChips().values
+//    }
 
 
     fun getCell(): Pair<Int, Int> {
