@@ -22,18 +22,18 @@ class MyFirstChart : Application() {
         root.children.add(canvasNew)
 
         val gc = canvasNew.graphicsContext2D
-        val image = Image(FileInputStream("src/main/board.jpg"))
-        gc.drawImage(image, 0.0, 0.0)
+        val background = Image(FileInputStream("src/main/board.jpg"))
+
 
 
         fun draw(board: Array<Array<Chess>>) {
+            gc.drawImage(background, 0.0, 0.0)
             for (stroke in board) {
                 for (chip in stroke) {
                     if (chip.getColor() != null) {
-                        var x1 = 1
                         var (x, y) = chip.getCell()
+                        var x1 = 1
                         if (y % 2 == 1) x1 = 2
-
                         val image = chip.getColor()!!.getImage()
                         y = (y + 1) * 70
                         x = 70 * (x * 2 + x1)
@@ -61,31 +61,32 @@ class MyFirstChart : Application() {
 //        }
 
 
-        //Определяю цвет для шашки, если в ячейке нет шашки, то null
-        fun setColor(y: Int): Colour? {
-            return when (y) {
-                in 0 until 3 -> Colour.WHITE
-                in 5 until 8 -> Colour.BLACK
-                else -> null
-            }
-        }
-
-        //заполняю board шашками
-        fun fillBoard(): Array<Array<Chess>> {
-            var board = arrayOf<Array<Chess>>()
-            for (x in 0 until 4) {
-                var array = arrayOf<Chess>()
-                for (y in 0 until 8) {
-                    array += Chess(x, y, setColor(y))
-                }
-                board += array
-            }
-            return board
-        }
 
         var board = fillBoard()
         draw(board)
         stage.show()
+    }
+}
+
+//заполняю board шашками
+fun fillBoard(): Array<Array<Chess>> {
+    var board = arrayOf<Array<Chess>>()
+    for (x in 0 until 4) {
+        var array = arrayOf<Chess>()
+        for (y in 0 until 8) {
+            array += Chess(x, y, setColor(y))
+        }
+        board += array
+    }
+    return board
+}
+
+//Определяю цвет для шашки, если в ячейке нет шашки, то null
+fun setColor(y: Int): Colour? {
+    return when (y) {
+        in 0 until 3 -> Colour.WHITE
+        in 5 until 8 -> Colour.BLACK
+        else -> null
     }
 }
 
