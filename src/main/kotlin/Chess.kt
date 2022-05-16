@@ -24,7 +24,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return colour
     }
 
-    fun changeColour(newColour: Colour?){
+    fun changeColour(newColour: Colour?) {
         colour = newColour
     }
 
@@ -41,10 +41,10 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
             if (colour == Colour.WHITE) y++
             else y--
 
-            if (x - 1 >= 0 && board[x - 1][y].getColour() == null) {
+            if (x - 1 >= 0 && (board[x - 1][y].getColour() == null || board[x - 1][y].getColour() == Colour.GREEN)) {
                 array += Pair(x - 1, y)
             }
-            if (x + 1 >= 0 && board[x + 1][y].getColour() == null) {
+            if (x + 1 <= 7 && (board[x + 1][y].getColour() == null || board[x + 1][y].getColour() == Colour.GREEN)) {
                 array += Pair(x + 1, y)
             }
         }

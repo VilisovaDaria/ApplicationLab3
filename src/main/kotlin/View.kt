@@ -27,7 +27,6 @@ class MyFirstChart : Application() {
         val background = Image(FileInputStream("src/main/board.jpg"))
 
 
-
         fun repaintScene(board: Array<Array<Chess>>) {
             gc.drawImage(background, 0.0, 0.0)
             for (stroke in board) {
@@ -44,28 +43,62 @@ class MyFirstChart : Application() {
         }
 
         val board = fillBoard()
+        var ready = mutableListOf<Any?>(null, false)
+
 
         stage.scene.onMousePressed =
             EventHandler<MouseEvent> { event ->
                 val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
-                val cellsCanMove = board[x][y].canMove(board)
-                for ((x, y) in cellsCanMove){
-                    board[x][y].changeColour(Colour.GREEN)
+                val cell = board[x][y]
+
+                if (cell.getColour() != Colour.GREEN) {
+                    //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
+                    val cellsCanMove = cell.canMove(board)
+                    if (cellsCanMove.isNotEmpty()) {
+                        if (!(ready[1] as Boolean)) {
+                            ready = mutableListOf(cell, true)
+                            for ((x, y) in cellsCanMove) {
+                                board[x][y].changeColour(Colour.GREEN)
+                            }
+                            repaintScene(board)
+                        } else
+                            if (cell == (ready[0] as Chess)) {
+                                ready = mutableListOf(null, false)
+                                for ((x, y) in cellsCanMove) {
+                                    board[x][y].changeColour(null)
+                                }
+                                repaintScene(board)
+                            }
+                    }
+                } else {
+                    val oldCell = (ready[0] as Chess)
+                    val oldMoves = oldCell.canMove(board)
+                    for ((x, y) in oldMoves) {
+                        board[x][y].changeColour(null)
+                    }
+                    cell.changeColour(oldCell.getColour())
+                    oldCell.changeColour(null)
+                    ready = mutableListOf(null, false)
+
+
+                    repaintScene(board)
                 }
-                repaintScene(board)
+
+
             }
 
         repaintScene(board)
         stage.show()
     }
-
-    fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
-        if (x in 70.0..630.0 && y in 70.0..630.0){
-            val cellX = (x.toInt() - 70) / 70
-            val cellY = (y.toInt() - 70) / 70
-            return Pair(cellX, cellY)
-        }
-        return Pair(0, 0)
-    }
 }
+
+fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
+    if (x in 70.0..630.0 && y in 70.0..630.0) {
+        val cellX = (x.toInt() - 70) / 70
+        val cellY = (y.toInt() - 70) / 70
+        return Pair(cellX, cellY)
+    }
+    return Pair(0, 0)
+}
+
 
