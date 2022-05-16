@@ -1,16 +1,11 @@
 import javafx.application.Application
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.event.EventType
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.Pane
 import javafx.stage.Stage
-import tornadofx.pause
-import tornadofx.toProperty
 import java.io.FileInputStream
 
 
@@ -31,17 +26,17 @@ class MyFirstChart : Application() {
         val gc = canvasNew.graphicsContext2D
         val background = Image(FileInputStream("src/main/board.jpg"))
 
-        fun paintScene(board: Array<Array<Chess>>) {
+
+
+        fun repaintScene(board: Array<Array<Chess>>) {
             gc.drawImage(background, 0.0, 0.0)
             for (stroke in board) {
                 for (chip in stroke) {
-                    var (x, y) = chip.getCell()
-                    if (chip.getColour(x, y) != null) {
-                        var x1 = 1
-                        if (y % 2 == 1) x1 = 2
-                        val image = chip.getColour(x, y)!!.getImage()
+                    var (x, y) = chip.getXY()
+                    if (chip.getColour() != null) {
+                        val image = chip.getColour()!!.getImage()
                         y = (y + 1) * 70
-                        x = 70 * (x * 2 + x1)
+                        x = 70 * (x + 1)
                         gc.drawImage(image, x.toDouble(), y.toDouble())
                     }
                 }
@@ -49,10 +44,28 @@ class MyFirstChart : Application() {
         }
 
         val board = fillBoard()
-        board[0][0] = Chess(3, 5, Colour.BLACK) // board - откуда берем шашку, а chess куда ставим
 
-        paintScene(board)
+        stage.scene.onMousePressed =
+            EventHandler<MouseEvent> { event ->
+                val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
+                val cellsCanMove = board[x][y].canMove(board)
+                for ((x, y) in cellsCanMove){
+                    board[x][y].changeColour(Colour.GREEN)
+                }
+                repaintScene(board)
+            }
+
+        repaintScene(board)
         stage.show()
     }
 
+    fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
+        if (x in 70.0..630.0 && y in 70.0..630.0){
+            val cellX = (x.toInt() - 70) / 70
+            val cellY = (y.toInt() - 70) / 70
+            return Pair(cellX, cellY)
+        }
+        return Pair(0, 0)
+    }
 }
+
