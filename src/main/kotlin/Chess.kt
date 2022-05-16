@@ -66,4 +66,11 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         }
         return null
     }
+
+    fun teleport(x: Int, y: Int) {
+        if (checkerMove(Chess(x, y, colour)).isNotEmpty())  {
+            this.x = x
+            this.y = y
+        }
+    }
 }
