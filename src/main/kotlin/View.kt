@@ -43,7 +43,7 @@ class MyFirstChart : Application() {
         }
 
         val board = fillBoard()
-        var ready = mutableListOf<Any?>(null, false)
+        var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
         stage.scene.onMousePressed =
@@ -51,38 +51,111 @@ class MyFirstChart : Application() {
                 val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
                 val cell = board[x][y]
 
-                if (cell.getColour() != Colour.GREEN) {
-                    //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
-                    val cellsCanMove = cell.canMove(board)
-                    if (cellsCanMove.isNotEmpty()) {
-                        if (!(ready[1] as Boolean)) {
-                            ready = mutableListOf(cell, true)
-                            for ((x, y) in cellsCanMove) {
-                                board[x][y].changeColour(Colour.GREEN)
-                            }
-                            repaintScene(board)
-                        } else
-                            if (cell == (ready[0] as Chess)) {
-                                ready = mutableListOf(null, false)
-                                for ((x, y) in cellsCanMove) {
-                                    board[x][y].changeColour(null)
+
+                val readyChip = (ready[0] as Chess)
+                val attackColour = readyChip.getColour()
+                val isReady = (ready[1] as Boolean)
+                val attackCells = canAttackAround(attackColour!!, board)
+
+                if (attackCells.isNotEmpty()) {
+                    for (chip in attackCells) {
+                        if (cell == chip.first || cell.getColour() == Colour.GREEN) {
+
+
+                            if (cell.getColour() != Colour.GREEN) {
+                                //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
+                                if (!isReady) { //если ни одна клетка не выделена
+                                    ready = mutableListOf(cell, true) //выделяем её
+                                    for ((x, y) in chip.second) {
+                                        board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
+                                    }
+                                    repaintScene(board) //перерисовываем сцену
+
+                                } else //повторное нажатие, если же выделена клетка
+                                    if (cell == readyChip) { //если нажали на выделенную клетку
+                                        ready =
+                                            mutableListOf(
+                                                Chess(-1, -1, cell.getColour()),
+                                                false
+                                            ) //отменяем выделение
+                                        for ((x, y) in chip.second) {
+                                            board[x][y].changeColour(null) //убираем зеленые клетки
+                                        }
+                                        repaintScene(board) //перерисовываю
+                                    }
+
+
+                            } else { //если клетка зеленая
+                                val oldChip = chip.first
+                                val oldMoves = chip.second
+
+                                val (x1, y1) = cell.getXY()
+                                val (x2, y2) = (ready[0] as Chess).getXY()
+                                val x3 = (x1 + x2) / 2
+                                val y3 = (y1 + y2) / 2
+                                println("$x1  $y1")
+                                println("$x2  $y2")
+                                println("$x3  $y3")
+                                board[x3][y3].changeColour(null)
+
+                                for ((x, y) in oldMoves) {
+                                    board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
                                 }
-                                repaintScene(board)
+                                cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
+                                readyChip.changeColour(null) //меняю цвет старой клетки на null
+                                ready = mutableListOf(
+                                    Chess(-1, -1, cell.opposite()),
+                                    false
+                                ) //отменяю выделение клетки, меняю цвет следующей ходящей
+
+
+                                    //здесь сделать ещё одну проверку canAttack(), чтобы продолжить бить остальные шашки
+                                repaintScene(board) //перерисовываю
                             }
-                    }
-                } else {
-                    val oldCell = (ready[0] as Chess)
-                    val oldMoves = oldCell.canMove(board)
-                    for ((x, y) in oldMoves) {
-                        board[x][y].changeColour(null)
-                    }
-                    cell.changeColour(oldCell.getColour())
-                    oldCell.changeColour(null)
-                    ready = mutableListOf(null, false)
 
 
-                    repaintScene(board)
-                }
+                        }
+                    }
+
+
+                } else
+                    if (cell.getColour() != Colour.GREEN) {
+                        if (attackColour == cell.getColour()) { //если цвет клетки соответствует ходящей
+                            //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
+                            val cellsCanMove = cell.canMove(board) //находим возможные пути клетки
+                            if (cellsCanMove.isNotEmpty()) { //если есть куда ходить
+                                if (!isReady) { //если ни одна клетка не выделена
+                                    ready = mutableListOf(cell, true) //выделяем её
+                                    for ((x, y) in cellsCanMove) {
+                                        board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
+                                    }
+                                    repaintScene(board) //перерисовываем сцену
+
+                                } else //повторное нажатие, если же выделена клетка
+                                    if (cell == readyChip) { //если нажали на выделенную клетку
+                                        ready =
+                                            mutableListOf(Chess(-1, -1, cell.getColour()), false) //отменяем выделение
+                                        for ((x, y) in cellsCanMove) {
+                                            board[x][y].changeColour(null) //убираем зеленые клетки
+                                        }
+                                        repaintScene(board) //перерисовываю
+                                    }
+                            }
+                        }
+                    } else { //если клетка зеленая
+                        val oldMoves = readyChip.canMove(board) //нахожу её возможные ходы
+                        for ((x, y) in oldMoves) {
+                            board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
+                        }
+                        cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
+                        readyChip.changeColour(null) //меняю цвет старой клетки на null
+                        ready = mutableListOf(
+                            Chess(-1, -1, cell.opposite()),
+                            false
+                        ) //отменяю выделение клетки, меняю цвет следующей ходящей
+
+                        repaintScene(board) //перерисовываю
+                    }
 
 
             }

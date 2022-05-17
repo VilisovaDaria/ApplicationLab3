@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import javafx.scene.image.Image
+import javax.swing.BoxLayout
 import kotlin.math.abs
 
 enum class Colour(private val image: Image) {
@@ -28,77 +29,78 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         colour = newColour
     }
 
-    fun isCellEmpty(): Boolean {
-        return getColour() == null
+    fun opposite(): Colour {
+        return if (colour == Colour.WHITE) Colour.BLACK
+        else Colour.WHITE
     }
 
     fun canMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var y = this.y
         var array = arrayOf<Pair<Int, Int>>()
 
-        if (colour == null) println("Это белая клетка")
-        else {
-            if (colour == Colour.WHITE) y++
-            else y--
+        if (colour != null) {
+            if (colour == Colour.WHITE) {
+                y++
+            } else y--
 
-            if (x - 1 >= 0 && (board[x - 1][y].getColour() == null || board[x - 1][y].getColour() == Colour.GREEN)) {
-                array += Pair(x - 1, y)
+            if (x - 1 >= 0 && x + 1 <= 7 && y in 0..7) {
+                val firstCell = board[x - 1][y]
+                val secondCell = board[x + 1][y]
+                if (x - 1 >= 0 && (firstCell.getColour() == null || firstCell.getColour() == Colour.GREEN)) {
+                    array += Pair(x - 1, y)
+                }
+                if (x + 1 <= 7 && (secondCell.getColour() == null || secondCell.getColour() == Colour.GREEN)) {
+                    array += Pair(x + 1, y)
+                }
             }
-            if (x + 1 <= 7 && (board[x + 1][y].getColour() == null || board[x + 1][y].getColour() == Colour.GREEN)) {
-                array += Pair(x + 1, y)
+        } else println("Это белая клетка")
+        return array
+    }
+
+
+    // у меня проблема, боковые шашки не бьют
+    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        var array = arrayOf<Pair<Int, Int>>()
+        var y = this.y
+        var x = this.x
+        if (colour == Colour.WHITE) {
+            y++
+        } else y--
+
+        if (x - 1 >= 0 && x + 1 <= 7 && y in 0..7) {
+            val firstCell = board[x - 1][y]
+            val secondCell = board[x + 1][y]
+            val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
+            if (x - 1 >= 0 && (firstCell.getColour() != colour && firstCell.getColour() in baseColours)) {
+                y = if (colour == Colour.WHITE) {
+                    this.y + 2
+                } else this.y - 2
+                if (x - 2 >= 0 && y in 0..7 && (board[x - 2][y].getColour() == null || board[x - 2][y].getColour() == Colour.GREEN)) {
+                    array += Pair(x - 2, y)
+                }
+            }
+            if (x + 1 <= 7 && (secondCell.getColour() != colour && secondCell.getColour() in baseColours)) {
+                y = if (colour == Colour.WHITE) {
+                    this.y + 2
+                } else this.y - 2
+                if (x + 2 >= 0 && y in 0..7 && (board[x + 2][y].getColour() == null || board[x + 2][y].getColour() == Colour.GREEN)) {
+                    array += Pair(x + 2, y)
+                }
             }
         }
-
         return array
     }
 }
 
-
-//    //переписать
-//
-//    fun checkerMove(chess: Chess): List<Pair<Int, Int>> {
-//        val result = mutableListOf<Pair<Int, Int>>()
-//
-//        if (chess.x in 1..3) {
-//            if (chess.y % 2 == 0) result.add(chess.x - 1 to chess.y + 1)
-//            else result.add(chess.x + 1 to chess.y + 1)
-//        }
-//
-//        result.add(chess.x to chess.y + 1)
-//
-//        result.forEach {
-//            if (isCellEmpty(it.first, it.second)) return listOf(it)
-//        }
-//
-//        return listOf()
-//    }
-//
-//
-//    fun checkerMoveAttack(x: Int, y: Int, chess: Chess): Pair<Int, Int>? {
-//        val (xInactive, yInactive) = chess.getXY()
-//        val xAttack = x
-//        val yAttack = y
-//        val colorAttack = getColour(xAttack, yAttack)
-//        val colorInactive = getColour(xInactive, yInactive)
-//
-//        if (isCellEmpty(xAttack, yAttack)) throw IllegalArgumentException("Chess does not exist")
-//
-//        if (colorAttack != colorInactive) {
-//
-//            if (checkerMove(chess).isNotEmpty()) { //проверяем от 2 шашки, которую предположительно будем бить, куда она может пойти
-//                // так как 1 из ходов является нужными координатами
-//
-//                checkerMove(chess)[0]  // нужная пара под 0 индексом в общем случае, но нужна проверка в отличии координат х
-//
-//                if (abs(checkerMove(chess)[0].first - xAttack) == 2) return checkerMove(chess)[0]
-//            }
-//        }
-//        return null
-//    }
-//
-//    fun teleport(x: Int, y: Int) {
-//        if (checkerMove(Chess(x, y, colour)).isNotEmpty()) {
-//            this.x = x
-//            this.y = y
-//        }
-//    }
+fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pair<Chess, Array<Pair<Int, Int>>>> {
+    var array = arrayOf<Pair<Chess,Array<Pair<Int, Int>>>>()
+    for (stroke in board){
+        for (chip in stroke){
+            if (chip.getColour() == attackColour) {
+                val attack = chip.canAttack(board)
+                if (attack.isNotEmpty()) array += Pair(chip, chip.canAttack(board))
+            }
+        }
+    }
+    return array
+}
