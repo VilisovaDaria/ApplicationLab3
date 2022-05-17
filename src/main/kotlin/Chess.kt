@@ -16,6 +16,8 @@ enum class Colour(private val image: Image) {
 
 class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
+    private val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
+
     fun getXY(): Pair<Int, Int> {
         return Pair(x, y)
     }
@@ -43,57 +45,47 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
                 y++
             } else y--
 
-            if (x - 1 >= 0 && x + 1 <= 7 && y in 0..7) {
-                val firstCell = board[x - 1][y]
-                val secondCell = board[x + 1][y]
-                if (x - 1 >= 0 && (firstCell.getColour() == null || firstCell.getColour() == Colour.GREEN)) {
-                    array += Pair(x - 1, y)
-                }
-                if (x + 1 <= 7 && (secondCell.getColour() == null || secondCell.getColour() == Colour.GREEN)) {
-                    array += Pair(x + 1, y)
-                }
-            }
+            if (x in 1..7 && board[x - 1][y].colour !in baseColours) array += Pair(x - 1, y)
+            if (x in 0..6 && board[x + 1][y].colour !in baseColours) array += Pair(x + 1, y)
+
         } else println("Это белая клетка")
+
         return array
     }
 
-
-    // у меня проблема, боковые шашки не бьют
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         var y = this.y
-        var x = this.x
+        val x = this.x
         if (colour == Colour.WHITE) {
             y++
         } else y--
 
-        if (x - 1 >= 0 && x + 1 <= 7 && y in 0..7) {
+        val a = if (colour == Colour.WHITE) {
+            this.y + 2
+        } else this.y - 2
+
+        if (x in 1..7) {
             val firstCell = board[x - 1][y]
-            val secondCell = board[x + 1][y]
-            val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
-            if (x - 1 >= 0 && (firstCell.getColour() != colour && firstCell.getColour() in baseColours)) {
-                y = if (colour == Colour.WHITE) {
-                    this.y + 2
-                } else this.y - 2
-                if (x - 2 >= 0 && y in 0..7 && (board[x - 2][y].getColour() == null || board[x - 2][y].getColour() == Colour.GREEN)) {
-                    array += Pair(x - 2, y)
-                }
-            }
-            if (x + 1 <= 7 && (secondCell.getColour() != colour && secondCell.getColour() in baseColours)) {
-                y = if (colour == Colour.WHITE) {
-                    this.y + 2
-                } else this.y - 2
-                if (x + 2 >= 0 && y in 0..7 && (board[x + 2][y].getColour() == null || board[x + 2][y].getColour() == Colour.GREEN)) {
-                    array += Pair(x + 2, y)
-                }
+            if (firstCell.colour != colour && firstCell.colour in baseColours) {
+                if (board[x - 2][a].getColour() == null) array += Pair(x - 2, a)
             }
         }
+        if (x in 0..6) {
+            val secondCell = board[x + 1][y]
+            if (secondCell.colour != colour && secondCell.colour in baseColours) {
+                if (board[x + 2][a].getColour() == null)  array += Pair(x + 2, a)
+            }
+        }
+
         return array
     }
+
 }
 
 fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pair<Chess, Array<Pair<Int, Int>>>> {
     var array = arrayOf<Pair<Chess,Array<Pair<Int, Int>>>>()
+
     for (stroke in board){
         for (chip in stroke){
             if (chip.getColour() == attackColour) {
