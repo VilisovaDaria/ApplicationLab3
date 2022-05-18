@@ -55,30 +55,31 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
-        var y = this.y
-        val x = this.x
-        if (colour == Colour.WHITE) {
-            y++
-        } else y--
+        val coefficient = listOf(Pair(this.y - 1, this.y - 2), Pair(this.y + 1, this.y + 2))
 
-        val a = if (colour == Colour.WHITE) {
-            this.y + 2
-        } else this.y - 2
+        try {
+            for (i in coefficient.indices) {
+                val second = coefficient[i].second
+                val first = coefficient[i].first
 
-        if (x in 2..7) {
-            val firstCell = board[x - 1][y]
-            if (firstCell.colour != colour && firstCell.colour in baseColours) {
-                if (board[x - 2][a].getColour() == null ||
-                    board[x - 2][a].getColour() == Colour.GREEN) array += Pair(x - 2, a)
+                if (x in 2..7) {
+                    val firstCell = board[x - 1][first]
+                    if (firstCell.colour != colour && firstCell.colour in baseColours) {
+                        if (board[x - 2][second].getColour() == null ||
+                            board[x - 2][second].getColour() == Colour.GREEN
+                        ) array += Pair(x - 2, second)
+                    }
+                }
+                if (x in 0..6) {
+                    val secondCell = board[x + 1][first]
+                    if (secondCell.colour != colour && secondCell.colour in baseColours) {
+                        if (board[x + 2][second].getColour() == null ||
+                            board[x + 2][second].getColour() == Colour.GREEN
+                        ) array += Pair(x + 2, second)
+                    }
+                }
             }
-        }
-        if (x in 0..6) {
-            val secondCell = board[x + 1][y]
-            if (secondCell.colour != colour && secondCell.colour in baseColours) {
-                if (board[x + 2][a].getColour() == null ||
-                    board[x + 2][a].getColour() == Colour.GREEN)  array += Pair(x + 2, a)
-            }
-        }
+        } catch (e: Exception) { println(IndexOutOfBoundsException(""))}
 
         return array
     }
