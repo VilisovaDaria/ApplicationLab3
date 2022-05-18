@@ -84,6 +84,42 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return array
     }
 
+
+
+    //эта функция обрабатывает только прямые ходы (не бьет назад, если поменять здесь
+//  в 96 строке и 100 colour.black, то функция будет обрабатывать только ходы назад), соответственно, в функции выше я рассматриваю клетки и
+    //на у ++ и на у --
+//    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+//        var array = arrayOf<Pair<Int, Int>>()
+//        var y = this.y
+//        val x = this.x
+//        if (colour == Colour.WHITE) {
+//            y++
+//        } else y--
+//
+//        val a = if (colour == Colour.WHITE) {
+//            this.y + 2
+//        } else this.y - 2
+//
+//        if (x in 2..7) {
+//            val firstCell = board[x - 1][y]
+//            if (firstCell.colour != colour && firstCell.colour in baseColours) {
+//                if (board[x - 2][a].getColour() == null ||
+//                    board[x - 2][a].getColour() == Colour.GREEN) array += Pair(x - 2, a)
+//            }
+//        }
+//        if (x in 0..6) {
+//            val secondCell = board[x + 1][y]
+//            if (secondCell.colour != colour && secondCell.colour in baseColours) {
+//                if (board[x + 2][a].getColour() == null ||
+//                    board[x + 2][a].getColour() == Colour.GREEN)  array += Pair(x + 2, a)
+//            }
+//        }
+//
+//        return array
+//    }
+
+
 }
 
 fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pair<Chess, Array<Pair<Int, Int>>>> {
