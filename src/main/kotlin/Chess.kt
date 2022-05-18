@@ -65,7 +65,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
             this.y + 2
         } else this.y - 2
 
-        if (x in 1..7) {
+        if (x in 2..7) {
             val firstCell = board[x - 1][y]
             if (firstCell.colour != colour && firstCell.colour in baseColours) {
                 if (board[x - 2][a].getColour() == null ||
@@ -76,7 +76,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
             val secondCell = board[x + 1][y]
             if (secondCell.colour != colour && secondCell.colour in baseColours) {
                 if (board[x + 2][a].getColour() == null ||
-                    board[x - 2][a].getColour() == Colour.GREEN)  array += Pair(x + 2, a)
+                    board[x + 2][a].getColour() == Colour.GREEN)  array += Pair(x + 2, a)
             }
         }
 
