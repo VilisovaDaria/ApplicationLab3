@@ -55,18 +55,18 @@ class MyFirstChart : Application() {
                 val readyChip = (ready[0] as Chess)
                 val attackColour = readyChip.getColour()
                 val isReady = (ready[1] as Boolean)
+
                 val attackCells = canAttackAround(attackColour!!, board)
 
                 if (attackCells.isNotEmpty()) {
-                    for (chip in attackCells) {
-                        if (cell == chip.first || cell.getColour() == Colour.GREEN) {
-
+                    for (chipInfo in attackCells) {
+                        if (cell == chipInfo.first || cell.getColour() == Colour.GREEN) {
 
                             if (cell.getColour() != Colour.GREEN) {
                                 //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
                                 if (!isReady) { //если ни одна клетка не выделена
                                     ready = mutableListOf(cell, true) //выделяем её
-                                    for ((x, y) in chip.second) {
+                                    for ((x, y) in chipInfo.second) {
                                         board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
                                     }
                                     repaintScene(board) //перерисовываем сцену
@@ -78,7 +78,7 @@ class MyFirstChart : Application() {
                                                 Chess(-1, -1, cell.getColour()),
                                                 false
                                             ) //отменяем выделение
-                                        for ((x, y) in chip.second) {
+                                        for ((x, y) in chipInfo.second) {
                                             board[x][y].changeColour(null) //убираем зеленые клетки
                                         }
                                         repaintScene(board) //перерисовываю
@@ -86,16 +86,14 @@ class MyFirstChart : Application() {
 
 
                             } else { //если клетка зеленая
-                                val oldChip = chip.first
-                                val oldMoves = chip.second
+                                val oldChip = chipInfo.first
+                                val oldMoves = chipInfo.second
 
                                 val (x1, y1) = cell.getXY()
                                 val (x2, y2) = (ready[0] as Chess).getXY()
                                 val x3 = (x1 + x2) / 2
                                 val y3 = (y1 + y2) / 2
-                                println("$x1  $y1")
-                                println("$x2  $y2")
-                                println("$x3  $y3")
+
                                 board[x3][y3].changeColour(null)
 
                                 for ((x, y) in oldMoves) {

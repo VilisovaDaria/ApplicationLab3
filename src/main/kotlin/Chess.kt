@@ -1,7 +1,5 @@
 import java.io.FileInputStream
 import javafx.scene.image.Image
-import javax.swing.BoxLayout
-import kotlin.math.abs
 
 enum class Colour(private val image: Image) {
     BLACK(Image(FileInputStream("src/main/chessBlack.png"))),
@@ -55,78 +53,37 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
-        val coefficient = listOf(Pair(this.y - 1, this.y - 2), Pair(this.y + 1, this.y + 2))
 
-        try {
-            for (i in coefficient.indices) {
-                val second = coefficient[i].second
-                val first = coefficient[i].first
-
+        val coefficient = listOf(1, -1)
+        for (i in coefficient) {
+            if (y + 2 * i in 0..7) {
                 if (x in 2..7) {
-                    val firstCell = board[x - 1][first]
-                    if (firstCell.colour != colour && firstCell.colour in baseColours) {
-                        if (board[x - 2][second].getColour() == null ||
-                            board[x - 2][second].getColour() == Colour.GREEN
-                        ) array += Pair(x - 2, second)
+                    val cell = board[x - 1][y + i]
+                    if (cell.colour != colour && cell.colour in baseColours) {
+                        if (board[x - 2][y + 2 * i].getColour() == null ||
+                            board[x - 2][y + 2 * i].getColour() == Colour.GREEN
+                        ) array += Pair(x - 2, y + 2 * i)
                     }
                 }
-                if (x in 0..6) {
-                    val secondCell = board[x + 1][first]
-                    if (secondCell.colour != colour && secondCell.colour in baseColours) {
-                        if (board[x + 2][second].getColour() == null ||
-                            board[x + 2][second].getColour() == Colour.GREEN
-                        ) array += Pair(x + 2, second)
+                if (x in 0..5) {
+                    val cell = board[x + 1][y + i]
+                    if (cell.colour != colour && cell.colour in baseColours) {
+                        if (board[x + 2][y + 2 * i].getColour() == null ||
+                            board[x + 2][y + 2 * i].getColour() == Colour.GREEN
+                        ) array += Pair(x + 2, y + 2 * i)
                     }
                 }
             }
-        } catch (e: Exception) { println(IndexOutOfBoundsException(""))}
-
+        }
         return array
     }
-
-
-
-    //эта функция обрабатывает только прямые ходы (не бьет назад, если поменять здесь
-//  в 96 строке и 100 colour.black, то функция будет обрабатывать только ходы назад), соответственно, в функции выше я рассматриваю клетки и
-    //на у ++ и на у --
-//    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
-//        var array = arrayOf<Pair<Int, Int>>()
-//        var y = this.y
-//        val x = this.x
-//        if (colour == Colour.WHITE) {
-//            y++
-//        } else y--
-//
-//        val a = if (colour == Colour.WHITE) {
-//            this.y + 2
-//        } else this.y - 2
-//
-//        if (x in 2..7) {
-//            val firstCell = board[x - 1][y]
-//            if (firstCell.colour != colour && firstCell.colour in baseColours) {
-//                if (board[x - 2][a].getColour() == null ||
-//                    board[x - 2][a].getColour() == Colour.GREEN) array += Pair(x - 2, a)
-//            }
-//        }
-//        if (x in 0..6) {
-//            val secondCell = board[x + 1][y]
-//            if (secondCell.colour != colour && secondCell.colour in baseColours) {
-//                if (board[x + 2][a].getColour() == null ||
-//                    board[x + 2][a].getColour() == Colour.GREEN)  array += Pair(x + 2, a)
-//            }
-//        }
-//
-//        return array
-//    }
-
-
 }
 
 fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pair<Chess, Array<Pair<Int, Int>>>> {
-    var array = arrayOf<Pair<Chess,Array<Pair<Int, Int>>>>()
+    var array = arrayOf<Pair<Chess, Array<Pair<Int, Int>>>>()
 
-    for (stroke in board){
-        for (chip in stroke){
+    for (stroke in board) {
+        for (chip in stroke) {
             if (chip.getColour() == attackColour) {
                 val attack = chip.canAttack(board)
                 if (attack.isNotEmpty()) array += Pair(chip, chip.canAttack(board))
@@ -135,3 +92,5 @@ fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pai
     }
     return array
 }
+
+fun isInside(x: Int, y: Int): Boolean = (x in 0..7 && y in 0..7)
