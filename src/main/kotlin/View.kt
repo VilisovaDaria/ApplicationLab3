@@ -42,7 +42,7 @@ class MyFirstChart : Application() {
             }
         }
 
-        val board = fillBoard()
+        var board = fillBoard()
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
@@ -86,29 +86,23 @@ class MyFirstChart : Application() {
 
 
                             } else { //если клетка зеленая
-                                val oldChip = chipInfo.first
-                                val oldMoves = chipInfo.second
 
-                                val (x1, y1) = cell.getXY()
-                                val (x2, y2) = (ready[0] as Chess).getXY()
-                                val x3 = (x1 + x2) / 2
-                                val y3 = (y1 + y2) / 2
+                                board = eat(chipInfo.second, cell, readyChip, board)
 
-                                board[x3][y3].changeColour(null)
-
-                                for ((x, y) in oldMoves) {
-                                    board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
+                                val canAttack = cell.canAttack(board)
+                                if (canAttack.isEmpty()){
+                                    ready = mutableListOf(
+                                        Chess(-1, -1, cell.opposite()),
+                                        false
+                                    ) //отменяю выделение клетки, меняю цвет следующей ходящей
+                                } else {
+                                    ready = mutableListOf(cell, true)
+                                    for ((x1, y1) in canAttack) {
+                                        board[x1][y1].changeColour(Colour.GREEN)
+                                    }
                                 }
-                                cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
-                                readyChip.changeColour(null) //меняю цвет старой клетки на null
-                                ready = mutableListOf(
-                                    Chess(-1, -1, cell.opposite()),
-                                    false
-                                ) //отменяю выделение клетки, меняю цвет следующей ходящей
 
-
-                                    //здесь сделать ещё одну проверку canAttack(), чтобы продолжить бить остальные шашки
-                                repaintScene(board) //перерисовываю
+                                repaintScene(board)
                             }
 
 
@@ -161,6 +155,23 @@ class MyFirstChart : Application() {
         repaintScene(board)
         stage.show()
     }
+}
+
+
+fun eat(oldMoves: Array<Pair<Int, Int>>, toCell: Chess, fromCell: Chess, board: Array<Array<Chess>>): Array<Array<Chess>> {
+    val (x1, y1) = toCell.getXY()
+    val (x2, y2) = fromCell.getXY()
+    val x3 = (x1 + x2) / 2
+    val y3 = (y1 + y2) / 2
+
+    board[x3][y3].changeColour(null)
+
+    for ((x, y) in oldMoves) {
+        board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
+    }
+    toCell.changeColour(fromCell.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
+    fromCell.changeColour(null) //меняю цвет старой клетки на null
+    return board
 }
 
 fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {

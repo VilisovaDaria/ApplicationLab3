@@ -56,24 +56,16 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
-
         val coefficient = listOf(1, -1)
+
         for (i in coefficient) {
             if (y + 2 * i in 0..7) {
-                if (x in 2..7) {
-                    val cell = board[x - 1][y + i]
+                if (x + i * 2 in 0..7) {
+                    val cell = board[x + i][y + i]
                     if (cell.colour != colour && cell.colour in baseColours) {
-                        if (board[x - 2][y + 2 * i].getColour() == null ||
-                            board[x - 2][y + 2 * i].getColour() == Colour.GREEN
-                        ) array += Pair(x - 2, y + 2 * i)
-                    }
-                }
-                if (x in 0..5) {
-                    val cell = board[x + 1][y + i]
-                    if (cell.colour != colour && cell.colour in baseColours) {
-                        if (board[x + 2][y + 2 * i].getColour() == null ||
-                            board[x + 2][y + 2 * i].getColour() == Colour.GREEN
-                        ) array += Pair(x + 2, y + 2 * i)
+                        if (board[x + i * 2][y + 2 * i].getColour() == null ||
+                            board[x + i * 2][y + 2 * i].getColour() == Colour.GREEN
+                        ) array += Pair(x + i * 2, y + 2 * i)
                     }
                 }
             }
@@ -82,74 +74,22 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
     }
 
 
-    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
+        val coefficient = listOf(1, -1)
 
-        for (i in 1..7) {
-            if (x - i in 0..7 && y + i in 0..7) {
-                val cellSecond = board[x - i][y + i]
-                if (cellSecond.colour == null || cellSecond.colour == Colour.GREEN) {
-                    array += Pair(x - i, y + i)
-                }
+        for (i in -7..7) {
+            for (k in coefficient) {
+                if (x + i + k in 0..7 && y + i + k in 0..7 &&
+                    x + i in 0..7 && y + i in 0..7) {
+                    val cell = board[x + i][y + i]
+                    if (cell.colour == null || cell.colour == Colour.GREEN)
+                        array += Pair(x + i, y + i)
 
-                if (x - i - 1 in 0..7 && y + i + 1 in 0..7) {
-                    if (cellSecond.colour != colour && cellSecond.colour in baseColours) {
-                        if (board[x - i - 1][y + i + 1].getColour() == null ||
-                            board[x - i - 1][y + i + 1].getColour() == Colour.GREEN
-                        ) array += Pair(x - i - 1, y + i + 1)
+                    if (cell.colour == colour) {
+                        break
                     }
                 }
-                if (cellSecond.colour == colour) return array
-            }
-            if (x + i in 0..7 && y + i in 0..7) {
-                val cellFirst = board[x + i][y + i]
-
-                if (cellFirst.colour == null || cellFirst.colour == Colour.GREEN) {
-                    array += Pair(x + i, y + i)
-                }
-
-                if (x + i + 1 in 0..7 && y + 1 + i in 0..7) {
-                    if (cellFirst.colour != colour && cellFirst.colour in baseColours) {
-                        if (board[x + i + 1][y + i + 1].getColour() == null ||
-                            board[x + i + 1][y + i + 1].getColour() == Colour.GREEN
-                        ) array += Pair(x + i + 1, y + i + 1)
-                    }
-                }
-                if (cellFirst.colour == colour) return array
-            }
-        }
-
-        for (i in 1..7) {
-            if (x - i in 0..7 && y - i in 0..7) {
-                val cellSecond = board[x - i][y - i]
-                if (cellSecond.colour == null || cellSecond.colour == Colour.GREEN) {
-                    array += Pair(x - i, y - i)
-                }
-
-                if (x - i - 1 in 0..7 && y - i + 1 in 0..7) {
-                    if (cellSecond.colour != colour && cellSecond.colour in baseColours) {
-                        if (board[x - i - 1][y - i + 1].getColour() == null ||
-                            board[x - i - 1][y - i + 1].getColour() == Colour.GREEN
-                        ) array += Pair(x - i - 1, y - i + 1)
-                    }
-                }
-                if (cellSecond.colour == colour) return array
-            }
-            if (x + i in 0..7 && y - i in 0..7) {
-                val cellFirst = board[x + i][y - i]
-
-                if (cellFirst.colour == null || cellFirst.colour == Colour.GREEN) {
-                    array += Pair(x + i, y - i)
-                }
-
-                if (x + i + 1 in 0..7 && y - 1 + i in 0..7) {
-                    if (cellFirst.colour != colour && cellFirst.colour in baseColours) {
-                        if (board[x + i + 1][y - i + 1].getColour() == null ||
-                            board[x + i + 1][y - i + 1].getColour() == Colour.GREEN
-                        ) array += Pair(x + i + 1, y - i + 1)
-                    }
-                }
-                if (cellFirst.colour == colour) return array
             }
         }
         return array
