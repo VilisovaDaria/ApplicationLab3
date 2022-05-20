@@ -18,6 +18,7 @@ enum class Colour(private val image: Image) {
 class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     private val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
+    var isQueen = false
 
     fun getXY(): Pair<Int, Int> {
         return Pair(x, y)
@@ -60,12 +61,14 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
         for (i in coefficient) {
             if (y + 2 * i in 0..7) {
-                if (x + i * 2 in 0..7) {
-                    val cell = board[x + i][y + i]
-                    if (cell.colour != colour && cell.colour in baseColours) {
-                        if (board[x + i * 2][y + 2 * i].getColour() == null ||
-                            board[x + i * 2][y + 2 * i].getColour() == Colour.GREEN
-                        ) array += Pair(x + i * 2, y + 2 * i)
+                for (j in coefficient) {
+                    if (x + j * 2 in 0..7) {
+                        val cell = board[x + j][y + i]
+                        if (cell.colour != colour && cell.colour in baseColours) {
+                            if (board[x + j * 2][y + 2 * i].getColour() == null ||
+                                board[x + j * 2][y + 2 * i].getColour() == Colour.GREEN
+                            ) array += Pair(x + j * 2, y + 2 * i)
+                        }
                     }
                 }
             }
@@ -81,7 +84,8 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         for (i in -7..7) {
             for (k in coefficient) {
                 if (x + i + k in 0..7 && y + i + k in 0..7 &&
-                    x + i in 0..7 && y + i in 0..7) {
+                    x + i in 0..7 && y + i in 0..7
+                ) {
                     val cell = board[x + i][y + i]
                     if (cell.colour == null || cell.colour == Colour.GREEN)
                         array += Pair(x + i, y + i)
