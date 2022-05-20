@@ -18,7 +18,6 @@ enum class Colour(private val image: Image) {
 class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     private val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
-    var isQueen = false
 
     fun getXY(): Pair<Int, Int> {
         return Pair(x, y)
@@ -77,21 +76,18 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
     }
 
 
-    fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
-        for (i in -7..7) {
+        for (i in 0..7) {
             for (k in coefficient) {
-                if (x + i + k in 0..7 && y + i + k in 0..7 &&
-                    x + i in 0..7 && y + i in 0..7
-                ) {
-                    val cell = board[x + i][y + i]
-                    if (cell.colour == null || cell.colour == Colour.GREEN)
-                        array += Pair(x + i, y + i)
-
-                    if (cell.colour == colour) {
-                        break
+                for (j in coefficient) {
+                    if (x + i * j in 0..7 && y + i * k in 0..7 && x + i in 0..7 && y + i in 0..7) {
+                        val cell = board[x + i * j][y + i * k]
+                        if (cell.colour == null || cell.colour == Colour.GREEN)
+                            array += Pair(x + i * j, y + i * k)
+                        if (cell.colour == colour) break
                     }
                 }
             }
