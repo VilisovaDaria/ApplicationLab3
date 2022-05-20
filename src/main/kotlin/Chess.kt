@@ -54,29 +54,29 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return array
     }
 
-//    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
-//        var array = arrayOf<Pair<Int, Int>>()
-//        val coefficient = listOf(1, -1)
-//
-//        for (i in coefficient) {
-//            if (y + 2 * i in 0..7) {
-//                for (j in coefficient) {
-//                    if (x + j * 2 in 0..7) {
-//                        val cell = board[x + j][y + i]
-//                        if (cell.colour != colour && cell.colour in baseColours) {
-//                            if (board[x + j * 2][y + 2 * i].getColour() == null ||
-//                                board[x + j * 2][y + 2 * i].getColour() == Colour.GREEN
-//                            ) array += Pair(x + j * 2, y + 2 * i)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return array
-//    }
-
-
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        var array = arrayOf<Pair<Int, Int>>()
+        val coefficient = listOf(1, -1)
+
+        for (i in coefficient) {
+            if (y + 2 * i in 0..7) {
+                for (j in coefficient) {
+                    if (x + j * 2 in 0..7) {
+                        val cell = board[x + j][y + i]
+                        if (cell.colour != colour && cell.colour in baseColours) {
+                            if (board[x + j * 2][y + 2 * i].getColour() == null ||
+                                board[x + j * 2][y + 2 * i].getColour() == Colour.GREEN
+                            ) array += Pair(x + j * 2, y + 2 * i)
+                        }
+                    }
+                }
+            }
+        }
+        return array
+    }
+
+
+    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
