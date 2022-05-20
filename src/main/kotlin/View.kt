@@ -26,6 +26,9 @@ class MyFirstChart : Application() {
         val gc = canvasNew.graphicsContext2D
         val background = Image(FileInputStream("src/main/board.jpg"))
 
+        var countBlack = 12
+        var countWhite = 12
+        var game = true
 
         fun repaintScene(board: Array<Array<Chess>>) {
             gc.drawImage(background, 0.0, 0.0)
@@ -42,123 +45,131 @@ class MyFirstChart : Application() {
             }
         }
 
+        fun actionReady(
+            selectedCell: Chess,
+            moves: Array<Pair<Int, Int>>,
+            readyInfo: MutableList<Any?>,
+            board: Array<Array<Chess>>
+        ): Pair<Array<Array<Chess>>, MutableList<Any?>> {
+            var ready = readyInfo
+            val readyChip = ready[0] as Chess
+            val isReady = ready[1] as Boolean
+            if (!isReady) { //если ни одна клетка не выделена
+                ready = mutableListOf(selectedCell, true) //выделяем её
+                for ((x, y) in moves) {
+                    board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
+                }
+                //repaintScene(board) //перерисовываем сцену
+
+            } else //повторное нажатие, если же выделена клетка
+                if (selectedCell == readyChip) { //если нажали на выделенную клетку
+                    ready =
+                        mutableListOf(
+                            Chess(-1, -1, selectedCell.getColour()),
+                            false
+                        ) //отменяем выделение
+                    for ((x, y) in moves) {
+                        board[x][y].changeColour(null) //убираем зеленые клетки
+                    }
+                    //repaintScene(board) //перерисовываю
+                }
+            return Pair(board, ready)
+        }
+
         var board = fillBoard()
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
+
         stage.scene.onMousePressed =
             EventHandler<MouseEvent> { event ->
-                val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
-                val cell = board[x][y]
+                if (game) {
+                    val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
+                    val cell = board[x][y]
+                    val readyChip = (ready[0] as Chess)
+                    val attackColour = readyChip.getColour()
 
+                    val attackCells = canAttackAround(attackColour!!, board)
 
-                val readyChip = (ready[0] as Chess)
-                val attackColour = readyChip.getColour()
-                val isReady = (ready[1] as Boolean)
+                    if (attackCells.isNotEmpty()) {
+                        for (chipInfo in attackCells) {
 
-                val attackCells = canAttackAround(attackColour!!, board)
+                            val chipCanAttack = chipInfo.first
+                            val cellsCanMove = chipInfo.second
 
-                if (attackCells.isNotEmpty()) {
-                    for (chipInfo in attackCells) {
-                        if (cell == chipInfo.first || cell.getColour() == Colour.GREEN) {
+                            if (cell == chipCanAttack) {
+                                val a = actionReady(cell, cellsCanMove, ready, board)
+                                board = a.first
+                                ready = a.second
 
-                            if (cell.getColour() != Colour.GREEN) {
-                                //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
-                                if (!isReady) { //если ни одна клетка не выделена
-                                    ready = mutableListOf(cell, true) //выделяем её
-                                    for ((x, y) in chipInfo.second) {
-                                        board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
-                                    }
-                                    repaintScene(board) //перерисовываем сцену
+                                repaintScene(board)
 
-                                } else //повторное нажатие, если же выделена клетка
-                                    if (cell == readyChip) { //если нажали на выделенную клетку
-                                        ready =
-                                            mutableListOf(
-                                                Chess(-1, -1, cell.getColour()),
-                                                false
-                                            ) //отменяем выделение
-                                        for ((x, y) in chipInfo.second) {
-                                            board[x][y].changeColour(null) //убираем зеленые клетки
-                                        }
-                                        repaintScene(board) //перерисовываю
-                                    }
+                            } else if (cell.getColour() == Colour.GREEN) {
 
+                                if (readyChip.getColour() == Colour.WHITE) countBlack--
+                                else countWhite--
 
-                            } else { //если клетка зеленая
-
-                                board = eat(chipInfo.second, cell, readyChip, board)
-
-                                val canAttack = cell.canAttack(board)
-                                if (canAttack.isEmpty()){
-                                    ready = mutableListOf(
-                                        Chess(-1, -1, cell.opposite()),
-                                        false
-                                    ) //отменяю выделение клетки, меняю цвет следующей ходящей
-                                } else {
-                                    ready = mutableListOf(cell, true)
-                                    for ((x1, y1) in canAttack) {
-                                        board[x1][y1].changeColour(Colour.GREEN)
-                                    }
-                                }
+                                board = eat(cellsCanMove, cell, readyChip, board)
+                                val continueInfo = continueAttack(cell, board)
+                                board = continueInfo.first
+                                ready = continueInfo.second
 
                                 repaintScene(board)
                             }
-
-
                         }
-                    }
 
 
-                } else
-                    if (cell.getColour() != Colour.GREEN) {
-                        if (attackColour == cell.getColour()) { //если цвет клетки соответствует ходящей
-                            //отрисовка зеленых клеток при нажатии и их исчезновении при повторном нажатии (нельзя выбрать другие клетки, если одна выбрана)
-                            val cellsCanMove = cell.canMove(board) //находим возможные пути клетки
-                            if (cellsCanMove.isNotEmpty()) { //если есть куда ходить
-                                if (!isReady) { //если ни одна клетка не выделена
-                                    ready = mutableListOf(cell, true) //выделяем её
-                                    for ((x, y) in cellsCanMove) {
-                                        board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
-                                    }
-                                    repaintScene(board) //перерисовываем сцену
+                    } else
+                        if (cell.getColour() != Colour.GREEN) {
+                            if (attackColour == cell.getColour()) {
 
-                                } else //повторное нажатие, если же выделена клетка
-                                    if (cell == readyChip) { //если нажали на выделенную клетку
-                                        ready =
-                                            mutableListOf(Chess(-1, -1, cell.getColour()), false) //отменяем выделение
-                                        for ((x, y) in cellsCanMove) {
-                                            board[x][y].changeColour(null) //убираем зеленые клетки
-                                        }
-                                        repaintScene(board) //перерисовываю
-                                    }
+                                val cellsCanMove = cell.canMove(board)
+                                if (cellsCanMove.isNotEmpty()) {
+
+                                    val readyInfo = actionReady(cell, cellsCanMove, ready, board)
+                                    board = readyInfo.first
+                                    ready = readyInfo.second
+
+                                    repaintScene(board)
+                                }
                             }
-                        }
-                    } else { //если клетка зеленая
-                        val oldMoves = readyChip.canMove(board) //нахожу её возможные ходы
-                        for ((x, y) in oldMoves) {
-                            board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
-                        }
-                        cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
-                        readyChip.changeColour(null) //меняю цвет старой клетки на null
-                        ready = mutableListOf(
-                            Chess(-1, -1, cell.opposite()),
-                            false
-                        ) //отменяю выделение клетки, меняю цвет следующей ходящей
+                        } else {
+                            val oldMoves = readyChip.canMove(board) //нахожу её возможные ходы
+                            board = changeColorInCells(oldMoves, null, board)
+                            cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
+                            readyChip.changeColour(null) //меняю цвет старой клетки на null
 
-                        repaintScene(board) //перерисовываю
+                            ready = mutableListOf(
+                                Chess(-1, -1, cell.opposite()),
+                                false
+                            )
+
+                            repaintScene(board)
+                        }
+                    if (countWhite == 0) {
+                        println("Black win")
+                        gc.drawImage(Image(FileInputStream("src/main/blackwin.png")), 0.0, 0.0)
+                        game = false
+                    } else if (countBlack == 0) {
+                        println("White win")
+                        game = false
+                        gc.drawImage(Image(FileInputStream("src/main/whitewin.png")), 0.0, 0.0)
                     }
-
-
+                }
             }
-
         repaintScene(board)
         stage.show()
     }
 }
 
 
-fun eat(oldMoves: Array<Pair<Int, Int>>, toCell: Chess, fromCell: Chess, board: Array<Array<Chess>>): Array<Array<Chess>> {
+fun eat(
+    moves: Array<Pair<Int, Int>>,
+    toCell: Chess,
+    fromCell: Chess,
+    oldBoard: Array<Array<Chess>>
+): Array<Array<Chess>> {
+    var board = oldBoard
     val (x1, y1) = toCell.getXY()
     val (x2, y2) = fromCell.getXY()
     val x3 = (x1 + x2) / 2
@@ -166,12 +177,28 @@ fun eat(oldMoves: Array<Pair<Int, Int>>, toCell: Chess, fromCell: Chess, board: 
 
     board[x3][y3].changeColour(null)
 
-    for ((x, y) in oldMoves) {
-        board[x][y].changeColour(null) //меняю цвет возможных ходов старой клетки на null
-    }
+    board = changeColorInCells(moves, null, board)
+
     toCell.changeColour(fromCell.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
     fromCell.changeColour(null) //меняю цвет старой клетки на null
     return board
+}
+
+fun continueAttack(selectedCell: Chess, oldBoard: Array<Array<Chess>>): Pair<Array<Array<Chess>>, MutableList<Any?>> {
+    val canAttack = selectedCell.canAttack(oldBoard)
+    var board = oldBoard
+    var ready: MutableList<Any?>
+    if (canAttack.isEmpty()) {
+        ready = mutableListOf(
+            Chess(-1, -1, selectedCell.opposite()),
+            false
+        ) //отменяю выделение клетки, меняю цвет следующей ходящей
+    } else {
+        ready = mutableListOf(selectedCell, true)
+        board = changeColorInCells(canAttack, Colour.GREEN, board)
+    }
+
+    return Pair(board, ready)
 }
 
 fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
@@ -183,4 +210,10 @@ fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
     return Pair(0, 0)
 }
 
+fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?, board: Array<Array<Chess>>): Array<Array<Chess>> {
+    for ((x, y) in moves) {
+        board[x][y].changeColour(colour)
+    }
+    return board
+}
 
