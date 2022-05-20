@@ -76,6 +76,7 @@ class MyFirstChart : Application() {
             return Pair(board, ready)
         }
 
+
         var board = fillBoard()
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
