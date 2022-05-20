@@ -80,7 +80,6 @@ class MyFirstChart : Application() {
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
-
         stage.scene.onMousePressed =
             EventHandler<MouseEvent> { event ->
                 if (game) {
@@ -187,7 +186,7 @@ fun eat(
 fun continueAttack(selectedCell: Chess, oldBoard: Array<Array<Chess>>): Pair<Array<Array<Chess>>, MutableList<Any?>> {
     val canAttack = selectedCell.canAttack(oldBoard)
     var board = oldBoard
-    var ready: MutableList<Any?>
+    val ready: MutableList<Any?>
     if (canAttack.isEmpty()) {
         ready = mutableListOf(
             Chess(-1, -1, selectedCell.opposite()),

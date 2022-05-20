@@ -50,7 +50,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
             if (x in 1..7 && board[x - 1][y].colour !in baseColours) array += Pair(x - 1, y)
             if (x in 0..6 && board[x + 1][y].colour !in baseColours) array += Pair(x + 1, y)
 
-        } else println("Это белая клетка")
+        }
 
         return array
     }
@@ -113,5 +113,3 @@ fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pai
     }
     return array
 }
-
-fun isInside(x: Int, y: Int): Boolean = (x in 0..7 && y in 0..7)
