@@ -4,7 +4,10 @@ import javafx.scene.image.Image
 enum class Colour(private val image: Image) {
     BLACK(Image(FileInputStream("src/main/chessBlack.png"))),
     WHITE(Image(FileInputStream("src/main/chessWhite.png"))),
-    GREEN(Image(FileInputStream("src/main/green.png")));
+    GREEN(Image(FileInputStream("src/main/green.png"))),
+    BLACKQUEEN(Image(FileInputStream("src/main/queenBlack.png"))),
+    WHITEQUEEN(Image(FileInputStream("src/main/queenWhite.png")));
+
 
     @JvmName("getImage1")
     fun getImage(): Image {
@@ -53,24 +56,38 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
 
     fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
-
         val coefficient = listOf(1, -1)
+
         for (i in coefficient) {
             if (y + 2 * i in 0..7) {
-                if (x in 2..7) {
-                    val cell = board[x - 1][y + i]
+                if (x + i * 2 in 0..7) {
+                    val cell = board[x + i][y + i]
                     if (cell.colour != colour && cell.colour in baseColours) {
-                        if (board[x - 2][y + 2 * i].getColour() == null ||
-                            board[x - 2][y + 2 * i].getColour() == Colour.GREEN
-                        ) array += Pair(x - 2, y + 2 * i)
+                        if (board[x + i * 2][y + 2 * i].getColour() == null ||
+                            board[x + i * 2][y + 2 * i].getColour() == Colour.GREEN
+                        ) array += Pair(x + i * 2, y + 2 * i)
                     }
                 }
-                if (x in 0..5) {
-                    val cell = board[x + 1][y + i]
-                    if (cell.colour != colour && cell.colour in baseColours) {
-                        if (board[x + 2][y + 2 * i].getColour() == null ||
-                            board[x + 2][y + 2 * i].getColour() == Colour.GREEN
-                        ) array += Pair(x + 2, y + 2 * i)
+            }
+        }
+        return array
+    }
+
+
+    fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        var array = arrayOf<Pair<Int, Int>>()
+        val coefficient = listOf(1, -1)
+
+        for (i in -7..7) {
+            for (k in coefficient) {
+                if (x + i + k in 0..7 && y + i + k in 0..7 &&
+                    x + i in 0..7 && y + i in 0..7) {
+                    val cell = board[x + i][y + i]
+                    if (cell.colour == null || cell.colour == Colour.GREEN)
+                        array += Pair(x + i, y + i)
+
+                    if (cell.colour == colour) {
+                        break
                     }
                 }
             }
