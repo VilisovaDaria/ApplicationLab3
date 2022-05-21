@@ -7,7 +7,6 @@ import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import java.io.FileInputStream
-import java.lang.Math.abs
 
 
 fun main() {
@@ -170,14 +169,12 @@ fun eat(
 ): Array<Array<Chess>> {
 
     var moves = moves
-
-
     var step = 1
-    val coefX = (toCell.x - fromCell.x)/(abs((toCell.x - fromCell.x)))
-    val coefY = (toCell.y - fromCell.y)/(abs((toCell.y - fromCell.y)))
+    val coefficientX = (toCell.x - fromCell.x)/(kotlin.math.abs((toCell.x - fromCell.x)))
+    val coefficientY = (toCell.y - fromCell.y)/(kotlin.math.abs((toCell.y - fromCell.y)))
 
-    while (fromCell.x + step * coefX != toCell.x && fromCell.y + step * coefY != toCell.y){
-        moves += Pair(fromCell.x + step * coefX, fromCell.y + step * coefY)
+    while (fromCell.x + step * coefficientX != toCell.x && fromCell.y + step * coefficientY != toCell.y){
+        moves += Pair(fromCell.x + step * coefficientX, fromCell.y + step * coefficientY)
         step++
     }
 
