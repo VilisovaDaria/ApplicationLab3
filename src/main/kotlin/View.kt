@@ -36,7 +36,9 @@ class MyFirstChart : Application() {
                 for (chip in stroke) {
                     var (x, y) = chip.getXY()
                     if (chip.colour != null) {
-                        val image = chip.colour!!.image
+                        var image = chip.colour!!.image
+                        if (chip.colour == Colour.WHITE && chip.isQueen) image = Colour.WHITEQUEEN.image
+                        else if (chip.colour == Colour.BLACK && chip.isQueen) image = Colour.BLACKQUEEN.image
                         y = (y + 1) * 70
                         x = 70 * (x + 1)
                         gc.drawImage(image, x.toDouble(), y.toDouble())
