@@ -35,8 +35,8 @@ class MyFirstChart : Application() {
             for (stroke in board) {
                 for (chip in stroke) {
                     var (x, y) = chip.getXY()
-                    if (chip.getColour() != null) {
-                        val image = chip.getColour()!!.getImage()
+                    if (chip.colour != null) {
+                        val image = chip.colour!!.image
                         y = (y + 1) * 70
                         x = 70 * (x + 1)
                         gc.drawImage(image, x.toDouble(), y.toDouble())
@@ -49,9 +49,8 @@ class MyFirstChart : Application() {
             selectedCell: Chess,
             moves: Array<Pair<Int, Int>>,
             readyInfo: MutableList<Any?>,
-            board: Array<Array<Chess>>
         ): Pair<Array<Array<Chess>>, MutableList<Any?>> {
-            var board = board
+
             var ready = readyInfo
             val readyChip = ready[0] as Chess
             val isReady = ready[1] as Boolean
@@ -63,7 +62,7 @@ class MyFirstChart : Application() {
                 if (selectedCell == readyChip) { //если нажали на выделенную клетку
                     ready =
                         mutableListOf(
-                            Chess(-1, -1, selectedCell.getColour()),
+                            Chess(-1, -1, selectedCell.colour),
                             false
                         ) //отменяем выделение
                     board = changeColorInCells(moves, null, board)
@@ -81,31 +80,30 @@ class MyFirstChart : Application() {
                     val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
                     val cell = board[x][y]
                     val readyChip = (ready[0] as Chess)
-                    val attackColour = readyChip.getColour()
+                    val attackColour = readyChip.colour
 
                     val attackCells = canAttackAround(attackColour!!, board)
 
                     if (attackCells.isNotEmpty()) {
-                        println("1111")
                         for (chipInfo in attackCells) {
 
                             val chipCanAttack = chipInfo.first
                             val cellsCanMove = chipInfo.second
 
                             if (cell == chipCanAttack) {
-                                val a = actionReady(cell, cellsCanMove, ready, board)
+                                val a = actionReady(cell, cellsCanMove, ready)
                                 board = a.first
                                 ready = a.second
 
                                 repaintScene(board)
 
-                            } else if (cell.getColour() == Colour.GREEN) {
+                            } else if (cell.colour == Colour.GREEN) {
 
-                                if (readyChip.getColour() == Colour.WHITE) countBlack--
+                                if (readyChip.colour == Colour.WHITE) countBlack--
                                 else countWhite--
 
-                                board = eat(cellsCanMove, cell, readyChip, board)
-                                val continueInfo = continueAttack(cell, board)
+                                board = eat(cellsCanMove, cell, readyChip)
+                                val continueInfo = continueAttack(cell)
                                 board = continueInfo.first
                                 ready = continueInfo.second
 
@@ -115,13 +113,13 @@ class MyFirstChart : Application() {
 
 
                     } else
-                        if (cell.getColour() != Colour.GREEN) {
-                            if (attackColour == cell.getColour()) {
+                        if (cell.colour != Colour.GREEN) {
+                            if (attackColour == cell.colour) {
 
                                 val cellsCanMove = cell.canMove(board)
                                 if (cellsCanMove.isNotEmpty()) {
 
-                                    val readyInfo = actionReady(cell, cellsCanMove, ready, board)
+                                    val readyInfo = actionReady(cell, cellsCanMove, ready)
                                     board = readyInfo.first
                                     ready = readyInfo.second
 
@@ -131,8 +129,8 @@ class MyFirstChart : Application() {
                         } else {
                             val oldMoves = readyChip.canMove(board) //нахожу её возможные ходы
                             board = changeColorInCells(oldMoves, null, board)
-                            cell.changeColour(readyChip.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
-                            readyChip.changeColour(null) //меняю цвет старой клетки на null
+
+                            move(cell, readyChip)
 
                             ready = mutableListOf(
                                 Chess(-1, -1, cell.opposite()),
@@ -161,31 +159,28 @@ class MyFirstChart : Application() {
 fun eat(
     moves: Array<Pair<Int, Int>>,
     toCell: Chess,
-    fromCell: Chess,
-    oldBoard: Array<Array<Chess>>
+    fromCell: Chess
 ): Array<Array<Chess>> {
-    var board = oldBoard
-    val (x1, y1) = toCell.getXY()
-    val (x2, y2) = fromCell.getXY()
-    val x3: Int = if (x1 - x2 < 0){
-        x1 + 1
-    } else x1 - 1
-    val y3: Int = if (y1 - y2 < 0){
-        y1 + 1
-    } else y1 - 1
 
-    board[x3][y3].changeColour(null)
+    val x3: Int = if (toCell.x - fromCell.x < 0) {
+        toCell.x + 1
+    } else toCell.x - 1
+
+    val y3: Int = if (toCell.y - fromCell.y < 0) {
+        toCell.y + 1
+    } else toCell.y - 1
 
     board = changeColorInCells(moves, null, board)
+    board[x3][y3].changeColour(null)
 
-    toCell.changeColour(fromCell.getColour()) //меняю цвет выбранной зеленой клетки на цвет старой клетки
-    fromCell.changeColour(null) //меняю цвет старой клетки на null
+    move(toCell, fromCell)
+
     return board
+
 }
 
-fun continueAttack(selectedCell: Chess, oldBoard: Array<Array<Chess>>): Pair<Array<Array<Chess>>, MutableList<Any?>> {
-    val canAttack = selectedCell.canAttack(oldBoard)
-    var board = oldBoard
+fun continueAttack(selectedCell: Chess): Pair<Array<Array<Chess>>, MutableList<Any?>> {
+    val canAttack = selectedCell.canAttack(board)
     val ready: MutableList<Any?>
     if (canAttack.isEmpty()) {
         ready = mutableListOf(
@@ -216,3 +211,16 @@ fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?, board: Arr
     return board
 }
 
+fun move(toCell: Chess, fromCell: Chess) {
+    toCell.changeRang(fromCell.isQueen)
+    toCell.changeColour(fromCell.colour) //меняю цвет выбранной зеленой клетки на цвет старой клетки
+    fromCell.changeColour(null) //меняю цвет старой клетки на null
+    fromCell.changeRang(false)
+
+    isReadyToBeQueen(toCell)
+}
+
+fun isReadyToBeQueen(cell: Chess){
+    if (cell.y == 0 && cell.colour == Colour.BLACK) cell.changeRang(true)
+    if (cell.y == 7 && cell.colour == Colour.WHITE) cell.changeRang(true)
+}

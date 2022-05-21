@@ -1,31 +1,21 @@
 import java.io.FileInputStream
 import javafx.scene.image.Image
+import javax.print.attribute.standard.MediaSize
 
-enum class Colour(private val image: Image) {
+enum class Colour(val image: Image) {
     BLACK(Image(FileInputStream("src/main/chessBlack.png"))),
     WHITE(Image(FileInputStream("src/main/chessWhite.png"))),
     GREEN(Image(FileInputStream("src/main/green.png"))),
     BLACKQUEEN(Image(FileInputStream("src/main/queenBlack.png"))),
     WHITEQUEEN(Image(FileInputStream("src/main/queenWhite.png")));
-
-
-    @JvmName("getImage1")
-    fun getImage(): Image {
-        return image
-    }
 }
 
-class Chess(var x: Int, var y: Int, var colour: Colour?) {
+class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
 
     private val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
 
     fun getXY(): Pair<Int, Int> {
         return Pair(x, y)
-    }
-
-    @JvmName("getColour1")
-    fun getColour(): Colour? {
-        return colour
     }
 
     fun changeColour(newColour: Colour?) {
@@ -37,7 +27,11 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         else Colour.WHITE
     }
 
-    fun canMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun changeRang(newRang: Boolean){
+        isQueen = newRang
+    }
+
+    private fun defaultMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var y = this.y
         var array = arrayOf<Pair<Int, Int>>()
 
@@ -54,7 +48,12 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return array
     }
 
-    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun canMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        return if (isQueen) queenMove(board)
+        else defaultMove(board)
+    }
+
+    private fun defaultAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -64,8 +63,8 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
                     if (x + j * 2 in 0..7) {
                         val cell = board[x + j][y + i]
                         if (cell.colour != colour && cell.colour in baseColours) {
-                            if (board[x + j * 2][y + 2 * i].getColour() == null ||
-                                board[x + j * 2][y + 2 * i].getColour() == Colour.GREEN
+                            if (board[x + j * 2][y + 2 * i].colour == null ||
+                                board[x + j * 2][y + 2 * i].colour == Colour.GREEN
                             ) array += Pair(x + j * 2, y + 2 * i)
                         }
                     }
@@ -75,8 +74,13 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return array
     }
 
+    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        return if (isQueen) queenAttack(board)
+        else defaultAttack(board)
+    }
 
-    fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+
+    private fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -95,7 +99,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
         return array
     }
 
-    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    private fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -104,10 +108,10 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
                 for (i in 1..7) {
                     if ((x + (i + 1) * j) in 0..7 && (y + (i + 1) * k in 0..7)) {
                         val cell = board[x + i * j][y + i * k]
-                        if (cell.getColour() in baseColours) {
+                        if (cell.colour in baseColours) {
                             if (cell.opposite() == colour) {
-                                if (board[x + (i + 1) * j][y + (i + 1) * k].getColour() == null ||
-                                    board[x + (i + 1) * j][y + (i + 1) * k].getColour() == Colour.GREEN
+                                if (board[x + (i + 1) * j][y + (i + 1) * k].colour == null ||
+                                    board[x + (i + 1) * j][y + (i + 1) * k].colour == Colour.GREEN
                                 ) {
                                     array += Pair(x + (i + 1) * j, y + (i + 1) * k)
                                     break
@@ -127,7 +131,7 @@ fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pai
 
     for (stroke in board) {
         for (chip in stroke) {
-            if (chip.getColour() == attackColour) {
+            if (chip.colour == attackColour) {
                 val attack = chip.canAttack(board)
                 if (attack.isNotEmpty()) array += Pair(chip, chip.canAttack(board))
             }
