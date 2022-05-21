@@ -7,6 +7,7 @@ import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import java.io.FileInputStream
+import kotlin.system.exitProcess
 
 
 fun main() {
@@ -16,6 +17,8 @@ fun main() {
 class MyFirstChart : Application() {
 
     override fun start(stage: Stage) {
+
+
         stage.isResizable = false
         val root = Group()
         stage.scene = Scene(root)
@@ -25,13 +28,29 @@ class MyFirstChart : Application() {
 
         val gc = canvasNew.graphicsContext2D
         val background = Image(FileInputStream("src/main/board.jpg"))
+        val restart = Image(FileInputStream("src/main/restart.png"), 70.0, 40.0, false, true)
+        val exit = Image(FileInputStream("src/main/exit.png"), 70.0, 40.0, false, true)
 
         var countBlack = 12
         var countWhite = 12
         var game = true
+        board = fillBoard()
+        var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
+
+        fun begin() {
+            countBlack = 12
+            countWhite = 12
+            game = true
+            board = arrayOf()
+            board = fillBoard()
+            ready = mutableListOf(Chess(-1, -1, Colour.WHITE), false)
+        }
+
 
         fun repaintScene(board: Array<Array<Chess>>) {
             gc.drawImage(background, 0.0, 0.0)
+            gc.drawImage(restart, 0.0, 0.0)
+            gc.drawImage(exit, 630.0, 0.0)
             for (stroke in board) {
                 for (chip in stroke) {
                     var (x, y) = chip.getXY()
@@ -49,6 +68,17 @@ class MyFirstChart : Application() {
                     }
                 }
             }
+        }
+
+        fun restart(x: Double, y: Double) {
+            if (x in 0.0..70.0 && y in 0.0..40.0) {
+                begin()
+                repaintScene(board)
+            }
+        }
+
+        fun exit(x: Double, y: Double) {
+            if (x in 630.0..700.0 && y in 0.0..40.0) exitProcess(0)
         }
 
         fun actionReady(
@@ -76,14 +106,16 @@ class MyFirstChart : Application() {
             return Pair(board, ready)
         }
 
-        board = fillBoard()
-        var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
         stage.scene.onMousePressed =
             EventHandler<MouseEvent> { event ->
+                val coordinateX = event.sceneX
+                val coordinateY = event.sceneY
+                val (x, y) = cellCoordinatesFromClick(coordinateX, coordinateY)
+                exit(coordinateX, coordinateY)
+                restart(coordinateX, coordinateY)
                 if (game) {
-                    val (x, y) = cellCoordinatesFromClick(event.sceneX, event.sceneY)
                     val cell = board[x][y]
                     val readyChip = (ready[0] as Chess)
                     val attackColour = readyChip.colour
@@ -148,11 +180,15 @@ class MyFirstChart : Application() {
                     if (countWhite == 0) {
                         println("Black win")
                         gc.drawImage(Image(FileInputStream("src/main/blackwin.png")), 0.0, 0.0)
+                        gc.drawImage(restart, 0.0, 0.0)
+                        gc.drawImage(exit, 630.0, 0.0)
                         game = false
                     } else if (countBlack == 0) {
                         println("White win")
                         game = false
                         gc.drawImage(Image(FileInputStream("src/main/whitewin.png")), 0.0, 0.0)
+                        gc.drawImage(restart, 0.0, 0.0)
+                        gc.drawImage(exit, 630.0, 0.0)
                     }
                 }
             }
@@ -170,10 +206,10 @@ fun eat(
 
     var moves = moves
     var step = 1
-    val coefficientX = (toCell.x - fromCell.x)/(kotlin.math.abs((toCell.x - fromCell.x)))
-    val coefficientY = (toCell.y - fromCell.y)/(kotlin.math.abs((toCell.y - fromCell.y)))
+    val coefficientX = (toCell.x - fromCell.x) / (kotlin.math.abs((toCell.x - fromCell.x)))
+    val coefficientY = (toCell.y - fromCell.y) / (kotlin.math.abs((toCell.y - fromCell.y)))
 
-    while (fromCell.x + step * coefficientX != toCell.x && fromCell.y + step * coefficientY != toCell.y){
+    while (fromCell.x + step * coefficientX != toCell.x && fromCell.y + step * coefficientY != toCell.y) {
         moves += Pair(fromCell.x + step * coefficientX, fromCell.y + step * coefficientY)
         step++
     }
@@ -230,3 +266,4 @@ fun isReadyToBeQueen(cell: Chess) {
     if (cell.y == 0 && cell.colour == Colour.BLACK) cell.changeRang(true)
     if (cell.y == 7 && cell.colour == Colour.WHITE) cell.changeRang(true)
 }
+
