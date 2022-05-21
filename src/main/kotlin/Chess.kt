@@ -76,19 +76,45 @@ class Chess(var x: Int, var y: Int, var colour: Colour?) {
     }
 
 
+    fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+        var array = arrayOf<Pair<Int, Int>>()
+        val coefficient = listOf(1, -1)
+
+        for (j in coefficient) {
+            for (k in coefficient) {
+                for (i in 1..7) {
+                    if (x + i * j in 0..7 && y + i * k in 0..7) {
+                        val cell = board[x + i * j][y + i * k]
+                        if (cell.colour !in baseColours) {
+                            array += Pair(x + i * j, y + i * k)
+                        } else break
+                    }
+                }
+            }
+        }
+        return array
+    }
+
     fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
-        for (i in 0..7) {
+        for (j in coefficient) {
             for (k in coefficient) {
-                for (j in coefficient) {
-                    if (x + i * j in 0..7 && y + i * k in 0..7 && x + i in 0..7 && y + i in 0..7) {
+                for (i in 1..7) {
+                    if ((x + (i + 1) * j) in 0..7 && (y + (i + 1) * k in 0..7)) {
                         val cell = board[x + i * j][y + i * k]
-                        if (cell.colour == null || cell.colour == Colour.GREEN)
-                            array += Pair(x + i * j, y + i * k)
-                        if (cell.colour == colour) break
-                    }
+                        if (cell.getColour() in baseColours) {
+                            if (cell.opposite() == colour) {
+                                if (board[x + (i + 1) * j][y + (i + 1) * k].getColour() == null ||
+                                    board[x + (i + 1) * j][y + (i + 1) * k].getColour() == Colour.GREEN
+                                ) {
+                                    array += Pair(x + (i + 1) * j, y + (i + 1) * k)
+                                    break
+                                } else break
+                            } else break
+                        }
+                    } else break
                 }
             }
         }

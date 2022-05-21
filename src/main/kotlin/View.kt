@@ -51,15 +51,13 @@ class MyFirstChart : Application() {
             readyInfo: MutableList<Any?>,
             board: Array<Array<Chess>>
         ): Pair<Array<Array<Chess>>, MutableList<Any?>> {
+            var board = board
             var ready = readyInfo
             val readyChip = ready[0] as Chess
             val isReady = ready[1] as Boolean
             if (!isReady) { //если ни одна клетка не выделена
                 ready = mutableListOf(selectedCell, true) //выделяем её
-                for ((x, y) in moves) {
-                    board[x][y].changeColour(Colour.GREEN) //рисуем зеленые клетки
-                }
-                //repaintScene(board) //перерисовываем сцену
+                board = changeColorInCells(moves, Colour.GREEN, board)
 
             } else //повторное нажатие, если же выделена клетка
                 if (selectedCell == readyChip) { //если нажали на выделенную клетку
@@ -68,14 +66,10 @@ class MyFirstChart : Application() {
                             Chess(-1, -1, selectedCell.getColour()),
                             false
                         ) //отменяем выделение
-                    for ((x, y) in moves) {
-                        board[x][y].changeColour(null) //убираем зеленые клетки
-                    }
-                    //repaintScene(board) //перерисовываю
+                    board = changeColorInCells(moves, null, board)
                 }
             return Pair(board, ready)
         }
-
 
         var board = fillBoard()
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
@@ -92,6 +86,7 @@ class MyFirstChart : Application() {
                     val attackCells = canAttackAround(attackColour!!, board)
 
                     if (attackCells.isNotEmpty()) {
+                        println("1111")
                         for (chipInfo in attackCells) {
 
                             val chipCanAttack = chipInfo.first
@@ -172,8 +167,12 @@ fun eat(
     var board = oldBoard
     val (x1, y1) = toCell.getXY()
     val (x2, y2) = fromCell.getXY()
-    val x3 = (x1 + x2) / 2
-    val y3 = (y1 + y2) / 2
+    val x3: Int = if (x1 - x2 < 0){
+        x1 + 1
+    } else x1 - 1
+    val y3: Int = if (y1 - y2 < 0){
+        y1 + 1
+    } else y1 - 1
 
     board[x3][y3].changeColour(null)
 
