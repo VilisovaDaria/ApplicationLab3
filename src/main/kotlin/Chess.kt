@@ -2,7 +2,7 @@ import java.io.FileInputStream
 import javafx.scene.image.Image
 import javax.print.attribute.standard.MediaSize
 
-enum class Colour(val image: Image) {
+enum class Colour(var image: Image) {
     BLACK(Image(FileInputStream("src/main/chessBlack.png"))),
     WHITE(Image(FileInputStream("src/main/chessWhite.png"))),
     GREEN(Image(FileInputStream("src/main/green.png"))),
@@ -27,7 +27,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         else Colour.WHITE
     }
 
-    fun changeRang(newRang: Boolean){
+    fun changeRang(newRang: Boolean) {
         isQueen = newRang
     }
 
