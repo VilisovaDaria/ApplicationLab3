@@ -56,15 +56,15 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
-        for (i in coefficient) {
-            if (y + 2 * i in 0..7) {
-                for (j in coefficient) {
-                    if (x + j * 2 in 0..7) {
-                        val cell = board[x + j][y + i]
+        for (coefficientY in coefficient) {
+            if (y + 2 * coefficientY in 0..7) {
+                for (coefficientX in coefficient) {
+                    if (x + coefficientX * 2 in 0..7) {
+                        val cell = board[x + coefficientX][y + coefficientY]
                         if (cell.colour != colour && cell.colour in baseColours) {
-                            if (board[x + j * 2][y + 2 * i].colour == null ||
-                                board[x + j * 2][y + 2 * i].colour == Colour.GREEN
-                            ) array += Pair(x + j * 2, y + 2 * i)
+                            if (board[x + coefficientX * 2][y + 2 * coefficientY].colour == null ||
+                                board[x + coefficientX * 2][y + 2 * coefficientY].colour == Colour.GREEN
+                            ) array += Pair(x + coefficientX * 2, y + 2 * coefficientY)
                         }
                     }
                 }
@@ -83,13 +83,13 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
-        for (j in coefficient) {
-            for (k in coefficient) {
+        for (coefficientX in coefficient) {
+            for (coefficientY in coefficient) {
                 for (i in 1..7) {
-                    if (x + i * j in 0..7 && y + i * k in 0..7) {
-                        val cell = board[x + i * j][y + i * k]
+                    if (x + i * coefficientX in 0..7 && y + i * coefficientY in 0..7) {
+                        val cell = board[x + i * coefficientX][y + i * coefficientY]
                         if (cell.colour !in baseColours) {
-                            array += Pair(x + i * j, y + i * k)
+                            array += Pair(x + i * coefficientX, y + i * coefficientY)
                         } else break
                     }
                 }
@@ -102,13 +102,13 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
-        for (j in coefficient) {
-            for (k in coefficient) {
+        for (coefficientX in coefficient) {
+            for (coefficientY in coefficient) {
                 var countOfEnemyChips = 0
                 var i = 1
-                while ((x + i * j) in 0..7 && (y + i * k in 0..7)) {
+                while ((x + i * coefficientX) in 0..7 && (y + i * coefficientY in 0..7)) {
 
-                    val cell = board[x + i * j][y + i * k]
+                    val cell = board[x + i * coefficientX][y + i * coefficientY]
                     if (cell.colour in baseColours) {
                         countOfEnemyChips++
                         if (cell.opposite() != colour || countOfEnemyChips >= 2) break
@@ -116,8 +116,8 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
                     } else {
                         if (countOfEnemyChips == 1) {
                             if (cell.colour == null || cell.colour == Colour.GREEN) array += Pair(
-                                x + i * j,
-                                y + i * k
+                                x + i * coefficientX,
+                                y + i * coefficientY
                             )
                         }
                     }
