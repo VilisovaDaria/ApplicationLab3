@@ -7,6 +7,7 @@ import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import java.io.FileInputStream
+import java.lang.Math.abs
 
 
 fun main() {
@@ -36,9 +37,13 @@ class MyFirstChart : Application() {
                 for (chip in stroke) {
                     var (x, y) = chip.getXY()
                     if (chip.colour != null) {
-                        var image = chip.colour!!.image
-                        if (chip.colour == Colour.WHITE && chip.isQueen) image = Colour.WHITEQUEEN.image
-                        else if (chip.colour == Colour.BLACK && chip.isQueen) image = Colour.BLACKQUEEN.image
+                        val image = if (chip.isQueen) {
+                            when (chip.colour) {
+                                Colour.WHITE -> Colour.WHITEQUEEN.image
+                                Colour.BLACK -> Colour.BLACKQUEEN.image
+                                else -> chip.colour!!.image
+                            }
+                        } else chip.colour!!.image
                         y = (y + 1) * 70
                         x = 70 * (x + 1)
                         gc.drawImage(image, x.toDouble(), y.toDouble())
@@ -72,7 +77,7 @@ class MyFirstChart : Application() {
             return Pair(board, ready)
         }
 
-        var board = fillBoard()
+        board = fillBoard()
         var ready = mutableListOf<Any?>(Chess(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
 
@@ -164,17 +169,19 @@ fun eat(
     fromCell: Chess
 ): Array<Array<Chess>> {
 
-    val x3: Int = if (toCell.x - fromCell.x < 0) {
-        toCell.x + 1
-    } else toCell.x - 1
+    var moves = moves
 
-    val y3: Int = if (toCell.y - fromCell.y < 0) {
-        toCell.y + 1
-    } else toCell.y - 1
+
+    var step = 1
+    val coefX = (toCell.x - fromCell.x)/(abs((toCell.x - fromCell.x)))
+    val coefY = (toCell.y - fromCell.y)/(abs((toCell.y - fromCell.y)))
+
+    while (fromCell.x + step * coefX != toCell.x && fromCell.y + step * coefY != toCell.y){
+        moves += Pair(fromCell.x + step * coefX, fromCell.y + step * coefY)
+        step++
+    }
 
     board = changeColorInCells(moves, null, board)
-    board[x3][y3].changeColour(null)
-
     move(toCell, fromCell)
 
     return board
@@ -222,7 +229,7 @@ fun move(toCell: Chess, fromCell: Chess) {
     isReadyToBeQueen(toCell)
 }
 
-fun isReadyToBeQueen(cell: Chess){
+fun isReadyToBeQueen(cell: Chess) {
     if (cell.y == 0 && cell.colour == Colour.BLACK) cell.changeRang(true)
     if (cell.y == 7 && cell.colour == Colour.WHITE) cell.changeRang(true)
 }

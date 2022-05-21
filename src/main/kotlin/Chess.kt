@@ -2,11 +2,11 @@ import java.io.FileInputStream
 import javafx.scene.image.Image
 
 enum class Colour(var image: Image) {
-    BLACK(Image(FileInputStream("src/main/chessBlack.png"))),
-    WHITE(Image(FileInputStream("src/main/chessWhite.png"))),
-    GREEN(Image(FileInputStream("src/main/green.png"))),
-    BLACKQUEEN(Image(FileInputStream("src/main/queenBlack.png"))),
-    WHITEQUEEN(Image(FileInputStream("src/main/queenWhite.png")));
+    BLACK(Image(FileInputStream("src/main/chessBlack.png"), 70.0, 70.0, false, true)),
+    WHITE(Image(FileInputStream("src/main/chessWhite.png"), 70.0, 70.0, false, true)),
+    GREEN(Image(FileInputStream("src/main/green.png"), 70.0, 70.0, false, true)),
+    BLACKQUEEN(Image(FileInputStream("src/main/queenBlack.png"), 70.0, 70.0, false, true)),
+    WHITEQUEEN(Image(FileInputStream("src/main/queenWhite.png"), 70.0, 70.0, false, true));
 }
 
 class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
@@ -104,20 +104,24 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
 
         for (j in coefficient) {
             for (k in coefficient) {
-                for (i in 1..7) {
-                    if ((x + (i + 1) * j) in 0..7 && (y + (i + 1) * k in 0..7)) {
-                        val cell = board[x + i * j][y + i * k]
-                        if (cell.colour in baseColours) {
-                            if (cell.opposite() == colour) {
-                                if (board[x + (i + 1) * j][y + (i + 1) * k].colour == null ||
-                                    board[x + (i + 1) * j][y + (i + 1) * k].colour == Colour.GREEN
-                                ) {
-                                    array += Pair(x + (i + 1) * j, y + (i + 1) * k)
-                                    break
-                                } else break
-                            } else break
+                var countOfEnemyChips = 0
+                var i = 1
+                while ((x + i * j) in 0..7 && (y + i * k in 0..7)) {
+
+                    val cell = board[x + i * j][y + i * k]
+                    if (cell.colour in baseColours) {
+                        countOfEnemyChips++
+                        if (cell.opposite() != colour || countOfEnemyChips >= 2) break
+
+                    } else {
+                        if (countOfEnemyChips == 1) {
+                            if (cell.colour == null || cell.colour == Colour.GREEN) array += Pair(
+                                x + i * j,
+                                y + i * k
+                            )
                         }
-                    } else break
+                    }
+                    i++
                 }
             }
         }
