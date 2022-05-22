@@ -3,10 +3,8 @@ import javafx.event.EventHandler
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
-import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
-import java.io.FileInputStream
 import kotlin.system.exitProcess
 
 
@@ -18,7 +16,6 @@ class MyFirstChart : Application() {
 
     override fun start(stage: Stage) {
 
-
         stage.isResizable = false
         val root = Group()
         stage.scene = Scene(root)
@@ -27,9 +24,6 @@ class MyFirstChart : Application() {
         root.children.add(canvasNew)
 
         val gc = canvasNew.graphicsContext2D
-        val background = Image(FileInputStream("src/main/board.jpg"))
-        val restart = Image(FileInputStream("src/main/restart.png"), 70.0, 40.0, false, true)
-        val exit = Image(FileInputStream("src/main/exit.png"), 70.0, 40.0, false, true)
 
         var countBlack = 12
         var countWhite = 12
@@ -179,14 +173,14 @@ class MyFirstChart : Application() {
                         }
                     if (countWhite == 0) {
                         println("Black win")
-                        gc.drawImage(Image(FileInputStream("src/main/blackwin.png")), 0.0, 0.0)
+                        gc.drawImage(blackWin, 0.0, 0.0)
                         gc.drawImage(restart, 0.0, 0.0)
                         gc.drawImage(exit, 630.0, 0.0)
                         game = false
                     } else if (countBlack == 0) {
                         println("White win")
                         game = false
-                        gc.drawImage(Image(FileInputStream("src/main/whitewin.png")), 0.0, 0.0)
+                        gc.drawImage(whiteWin, 0.0, 0.0)
                         gc.drawImage(restart, 0.0, 0.0)
                         gc.drawImage(exit, 630.0, 0.0)
                     }

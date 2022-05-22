@@ -1,12 +1,37 @@
 import java.io.FileInputStream
 import javafx.scene.image.Image
+import java.nio.file.Paths
+
+class ResourceReader {
+    fun pathResource(fileName: String): String {
+        val uri = this.javaClass.getResource("/$fileName").toURI()
+        return Paths.get(uri).toString()
+    }
+}
+
+fun getImage(fileName: String,height: Double, width: Double): Image {
+    val reader = ResourceReader()
+    return Image(FileInputStream(reader.pathResource(fileName)), height, width, false, true)
+}
+
+val black = getImage("chessBlack.png", 70.0, 70.0)
+val white = getImage("chessWhite.png", 70.0, 70.0)
+val green = getImage("green.png", 70.0, 70.0)
+val blackQueen = getImage("queenBlack.png", 70.0, 70.0)
+val whiteQueen = getImage("queenWhite.png", 70.0, 70.0)
+val background = getImage("board.jpg", 700.0, 700.0)
+val restart = getImage("restart.png", 70.0, 40.0)
+val exit = getImage("exit.png", 70.0, 40.0)
+val whiteWin = getImage("whiteWin.png", 700.0, 700.0)
+val blackWin = getImage("blackWin.png", 700.0, 700.0)
+
 
 enum class Colour(var image: Image) {
-    BLACK(Image(FileInputStream("src/main/chessBlack.png"), 70.0, 70.0, false, true)),
-    WHITE(Image(FileInputStream("src/main/chessWhite.png"), 70.0, 70.0, false, true)),
-    GREEN(Image(FileInputStream("src/main/green.png"), 70.0, 70.0, false, true)),
-    BLACKQUEEN(Image(FileInputStream("src/main/queenBlack.png"), 70.0, 70.0, false, true)),
-    WHITEQUEEN(Image(FileInputStream("src/main/queenWhite.png"), 70.0, 70.0, false, true));
+    BLACK(black),
+    WHITE(white),
+    GREEN(green),
+    BLACKQUEEN(blackQueen),
+    WHITEQUEEN(whiteQueen);
 }
 
 class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
@@ -98,7 +123,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         return array
     }
 
-    private fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
