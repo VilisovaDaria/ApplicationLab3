@@ -4,7 +4,6 @@ import kotlin.test.assertEquals
 
 
 class Test {
-
     private val board = fillBoard()
 
     @Test
@@ -20,9 +19,9 @@ class Test {
     }
 
     @Test
-    fun chessMove() {
-        board[7][5] = Chess(7, 5, Colour.BLACKQUEEN, true)
-        board[5][3] = Chess(5, 3, null, false)
+    fun checkerMove() {
+        board[7][5] = Checker(7, 5, Colour.BLACKQUEEN, true)
+        board[5][3] = Checker(5, 3, null, false)
         assertContentEquals(arrayOf(6 to 4, 5 to 3), board[7][5].canMove(board))
 
         assertContentEquals(arrayOf(1 to 3), board[0][2].canMove(board))
@@ -32,11 +31,11 @@ class Test {
 
 
     @Test
-    fun chessAttack() {
-        board[1][3] = Chess(1, 3, Colour.BLACK, false)
+    fun checkerAttack() {
+        board[1][3] = Checker(1, 3, Colour.BLACK, false)
         assertContentEquals(arrayOf(2 to 4), board[0][2].queenAttack(board))
-        board[3][3] = Chess(3, 3, Colour.BLACK, false)
-        board[5][3] = Chess(5, 3, Colour.BLACK, false)
+        board[3][3] = Checker(3, 3, Colour.BLACK, false)
+        board[5][3] = Checker(5, 3, Colour.BLACK, false)
         assertContentEquals(arrayOf(6 to 4, 2 to 4), board[4][2].canAttack(board))
     }
 

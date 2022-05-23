@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 class ResourceReader {
     fun pathResource(fileName: String): String {
-        val uri = this.javaClass.getResource("/$fileName").toURI()
+        val uri = this.javaClass.getResource("/$fileName")!!.toURI()
         return Paths.get(uri).toString()
     }
 }
@@ -34,7 +34,7 @@ enum class Colour(var image: Image) {
     WHITEQUEEN(whiteQueen);
 }
 
-class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
+class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
 
     private val baseColours = arrayOf(Colour.BLACK, Colour.WHITE)
 
@@ -55,7 +55,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         isQueen = newRang
     }
 
-    private fun defaultMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    private fun defaultMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         var y = this.y
         var array = arrayOf<Pair<Int, Int>>()
 
@@ -72,12 +72,12 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         return array
     }
 
-    fun canMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun canMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         return if (isQueen) queenMove(board)
         else defaultMove(board)
     }
 
-    private fun defaultAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    private fun defaultAttack(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -98,13 +98,13 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         return array
     }
 
-    fun canAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun canAttack(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         return if (isQueen) queenAttack(board)
         else defaultAttack(board)
     }
 
 
-    private fun queenMove(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    private fun queenMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -123,7 +123,7 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
         return array
     }
 
-    fun queenAttack(board: Array<Array<Chess>>): Array<Pair<Int, Int>> {
+    fun queenAttack(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 
@@ -154,8 +154,8 @@ class Chess(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = 
     }
 }
 
-fun canAttackAround(attackColour: Colour, board: Array<Array<Chess>>): Array<Pair<Chess, Array<Pair<Int, Int>>>> {
-    var array = arrayOf<Pair<Chess, Array<Pair<Int, Int>>>>()
+fun canAttackAround(attackColour: Colour, board: Array<Array<Checker>>): Array<Pair<Checker, Array<Pair<Int, Int>>>> {
+    var array = arrayOf<Pair<Checker, Array<Pair<Int, Int>>>>()
 
     for (stroke in board) {
         for (chip in stroke) {

@@ -1,12 +1,12 @@
-var board = arrayOf<Array<Chess>>()
+var board = arrayOf<Array<Checker>>()
 
-fun fillBoard(): Array<Array<Chess>> {
+fun fillBoard(): Array<Array<Checker>> {
     for (x in 0 until 8) {
-        var array = arrayOf<Chess>()
+        var array = arrayOf<Checker>()
         for (y in 0 until 8) {
             array += if (x % 2 == 0 && y % 2 == 0 || x % 2 == 1 && y % 2 == 1)
-                Chess(x, y, setColor(y))
-            else Chess(x, y, null)
+                Checker(x, y, setColor(y))
+            else Checker(x, y, null)
         }
         board += array
     }
