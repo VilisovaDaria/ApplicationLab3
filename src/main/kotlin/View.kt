@@ -7,7 +7,6 @@ import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import kotlin.system.exitProcess
 
-
 fun main() {
     Application.launch(MyFirstChart::class.java)
 }
@@ -43,8 +42,8 @@ class MyFirstChart : Application() {
 
         fun repaintScene(board: Array<Array<Checker>>) {
             gc.drawImage(background, 0.0, 0.0)
-            gc.drawImage(restart, 0.0, 0.0)
-            gc.drawImage(exit, 630.0, 0.0)
+            gc.drawImage(restart, 10.0, 10.0)
+            gc.drawImage(exit, 620.0, 10.0)
             for (stroke in board) {
                 for (checker in stroke) {
                     var (x, y) = checker.getXY()
@@ -65,39 +64,33 @@ class MyFirstChart : Application() {
         }
 
         fun restart(x: Double, y: Double) {
-            if (x in 0.0..70.0 && y in 0.0..40.0) {
+            if (x in 10.0..80.0 && y in 10.0..50.0) {
                 begin()
                 repaintScene(board)
             }
         }
 
         fun exit(x: Double, y: Double) {
-            if (x in 630.0..700.0 && y in 0.0..40.0) exitProcess(0)
+            if (x in 620.0..690.0 && y in 10.0..50.0) exitProcess(0)
         }
 
         fun actionReady(
             selectedCell: Checker,
             moves: Array<Pair<Int, Int>>,
-            readyInfo: MutableList<Any?>,
-        ): Pair<Array<Array<Checker>>, MutableList<Any?>> {
-
-            var ready = readyInfo
-            val readyChip = ready[0] as Checker
-            val isReady = ready[1] as Boolean
-            if (!isReady) { //если ни одна клетка не выделена
+        ){
+            if (!(ready[1] as Boolean)) { //если ни одна клетка не выделена
                 ready = mutableListOf(selectedCell, true) //выделяем её
-                board = changeColorInCells(moves, Colour.GREEN, board)
+                changeColorInCells(moves, Colour.GREEN)
 
             } else //повторное нажатие, если же выделена клетка
-                if (selectedCell == readyChip) { //если нажали на выделенную клетку
+                if (selectedCell == ready[0] as Checker) { //если нажали на выделенную клетку
                     ready =
                         mutableListOf(
                             Checker(-1, -1, selectedCell.colour),
                             false
                         ) //отменяем выделение
-                    board = changeColorInCells(moves, null, board)
+                    changeColorInCells(moves, null)
                 }
-            return Pair(board, ready)
         }
 
 
@@ -106,9 +99,12 @@ class MyFirstChart : Application() {
             EventHandler<MouseEvent> { event ->
                 val coordinateX = event.sceneX
                 val coordinateY = event.sceneY
-                val (x, y) = cellCoordinatesFromClick(coordinateX, coordinateY)
+
                 exit(coordinateX, coordinateY)
                 restart(coordinateX, coordinateY)
+
+                val (x, y) = cellCoordinatesFromClick(coordinateX, coordinateY)
+
                 if (game) {
                     val cell = board[x][y]
                     val readyChecker = (ready[0] as Checker)
@@ -123,9 +119,7 @@ class MyFirstChart : Application() {
                             val cellsCanMove = checkerInfo.second
 
                             if (cell == checkerCanAttack) {
-                                val a = actionReady(cell, cellsCanMove, ready)
-                                board = a.first
-                                ready = a.second
+                                actionReady(cell, cellsCanMove)
 
                                 repaintScene(board)
 
@@ -135,15 +129,11 @@ class MyFirstChart : Application() {
                                 else countWhite--
 
                                 board = eat(cellsCanMove, cell, readyChecker)
-                                val continueInfo = continueAttack(cell)
-                                board = continueInfo.first
-                                ready = continueInfo.second
+                                ready = continueAttack(cell)
 
                                 repaintScene(board)
                             }
                         }
-
-
                     } else
                         if (cell.colour != Colour.GREEN) {
                             if (attackColour == cell.colour) {
@@ -151,17 +141,13 @@ class MyFirstChart : Application() {
                                 val cellsCanMove = cell.canMove(board)
                                 if (cellsCanMove.isNotEmpty()) {
 
-                                    val readyInfo = actionReady(cell, cellsCanMove, ready)
-                                    board = readyInfo.first
-                                    ready = readyInfo.second
+                                    actionReady(cell, cellsCanMove)
 
                                     repaintScene(board)
                                 }
                             }
                         } else {
-                            val oldMoves = readyChecker.canMove(board) //нахожу её возможные ходы
-                            board = changeColorInCells(oldMoves, null, board)
-
+                            changeColorInCells(readyChecker.canMove(board), null)
                             move(cell, readyChecker)
 
                             ready = mutableListOf(
@@ -198,24 +184,24 @@ fun eat(
     fromCell: Checker
 ): Array<Array<Checker>> {
 
-    var moves = moves
+    var cellsToRepaint = moves
     var step = 1
     val coefficientX = (toCell.x - fromCell.x) / (kotlin.math.abs((toCell.x - fromCell.x)))
     val coefficientY = (toCell.y - fromCell.y) / (kotlin.math.abs((toCell.y - fromCell.y)))
 
     while (fromCell.x + step * coefficientX != toCell.x && fromCell.y + step * coefficientY != toCell.y) {
-        moves += Pair(fromCell.x + step * coefficientX, fromCell.y + step * coefficientY)
+        cellsToRepaint += Pair(fromCell.x + step * coefficientX, fromCell.y + step * coefficientY)
         step++
     }
 
-    board = changeColorInCells(moves, null, board)
+    changeColorInCells(cellsToRepaint, null)
     move(toCell, fromCell)
 
     return board
 
 }
 
-fun continueAttack(selectedCell: Checker): Pair<Array<Array<Checker>>, MutableList<Any?>> {
+fun continueAttack(selectedCell: Checker): MutableList<Any?> {
     val canAttack = selectedCell.canAttack(board)
     val ready: MutableList<Any?>
     if (canAttack.isEmpty()) {
@@ -225,10 +211,10 @@ fun continueAttack(selectedCell: Checker): Pair<Array<Array<Checker>>, MutableLi
         ) //отменяю выделение клетки, меняю цвет следующей ходящей
     } else {
         ready = mutableListOf(selectedCell, true)
-        board = changeColorInCells(canAttack, Colour.GREEN, board)
+        changeColorInCells(canAttack, Colour.GREEN)
     }
 
-    return Pair(board, ready)
+    return ready
 }
 
 fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
@@ -240,11 +226,10 @@ fun cellCoordinatesFromClick(x: Double, y: Double): Pair<Int, Int> {
     return Pair(0, 0)
 }
 
-fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?, board: Array<Array<Checker>>): Array<Array<Checker>> {
+fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?) {
     for ((x, y) in moves) {
         board[x][y].changeColour(colour)
     }
-    return board
 }
 
 fun move(toCell: Checker, fromCell: Checker) {
