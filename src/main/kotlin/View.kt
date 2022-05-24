@@ -3,7 +3,6 @@ import javafx.event.EventHandler
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
-import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 import kotlin.system.exitProcess
 
@@ -96,7 +95,7 @@ class MyFirstChart : Application() {
 
 
         stage.scene.onMousePressed =
-            EventHandler<MouseEvent> { event ->
+            EventHandler { event ->
                 val coordinateX = event.sceneX
                 val coordinateY = event.sceneY
 
