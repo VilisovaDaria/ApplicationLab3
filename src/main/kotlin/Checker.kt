@@ -1,12 +1,9 @@
 import javafx.scene.image.Image
 
-
 enum class Colour(var image: Image) {
     BLACK(black),
     WHITE(white),
-    GREEN(green),
-    BLACKQUEEN(blackQueen),
-    WHITEQUEEN(whiteQueen);
+    GREEN(green);
 }
 
 class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean = false) {
@@ -127,18 +124,4 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
         }
         return array
     }
-}
-
-fun canAttackAround(attackColour: Colour, board: Array<Array<Checker>>): Array<Pair<Checker, Array<Pair<Int, Int>>>> {
-    var array = arrayOf<Pair<Checker, Array<Pair<Int, Int>>>>()
-
-    for (stroke in board) {
-        for (chip in stroke) {
-            if (chip.colour == attackColour) {
-                val attack = chip.canAttack(board)
-                if (attack.isNotEmpty()) array += Pair(chip, chip.canAttack(board))
-            }
-        }
-    }
-    return array
 }

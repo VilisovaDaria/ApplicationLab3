@@ -16,7 +16,7 @@ fun getImage(fileName: String,height: Double, width: Double): Image {
 
 val black = getImage("chessBlack.png", 70.0, 70.0)
 val white = getImage("chessWhite.png", 70.0, 70.0)
-val green = getImage("green.png", 70.0, 70.0)
+val green = getImage("green.png", 71.0, 70.0)
 val blackQueen = getImage("queenBlack.png", 70.0, 70.0)
 val whiteQueen = getImage("queenWhite.png", 70.0, 70.0)
 val background = getImage("board.jpg", 700.0, 700.0)

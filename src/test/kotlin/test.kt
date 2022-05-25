@@ -20,7 +20,7 @@ class Test {
 
     @Test
     fun checkerMove() {
-        board[7][5] = Checker(7, 5, Colour.BLACKQUEEN, true)
+        board[7][5] = Checker(7, 5, Colour.BLACK, true)
         board[5][3] = Checker(5, 3, null, false)
         assertContentEquals(arrayOf(6 to 4, 5 to 3), board[7][5].canMove(board))
 
