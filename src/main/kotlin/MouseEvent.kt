@@ -5,7 +5,7 @@ var countWhite = 12
 var game = true
 var ready = mutableListOf<Any?>(Checker(-1, -1, Colour.WHITE), false) //показывает, выделена ли какая-то клетка
 
-fun controller(coordinateX: Double, coordinateY: Double){
+fun mouseEvent(coordinateX: Double, coordinateY: Double){
     exit(coordinateX, coordinateY)
     restart(coordinateX, coordinateY)
 

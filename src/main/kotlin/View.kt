@@ -6,10 +6,10 @@ import javafx.scene.canvas.Canvas
 import javafx.stage.Stage
 
 fun main() {
-    Application.launch(MyFirstChart::class.java)
+    Application.launch(App::class.java)
 }
 
-class MyFirstChart : Application() {
+class App : Application() {
 
     override fun start(stage: Stage) {
         stage.isResizable = false
@@ -47,7 +47,7 @@ class MyFirstChart : Application() {
 
         stage.scene.onMousePressed =
             EventHandler { event ->
-                controller(event.sceneX, event.sceneY)
+                mouseEvent(event.sceneX, event.sceneY)
 
                 if (countWhite == 0) {
                     gc.drawImage(blackWin, 0.0, 0.0)

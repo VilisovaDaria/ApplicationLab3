@@ -44,6 +44,25 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
         return array
     }
 
+    private fun queenMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
+        var array = arrayOf<Pair<Int, Int>>()
+        val coefficient = listOf(1, -1)
+
+        for (coefficientX in coefficient) {
+            for (coefficientY in coefficient) {
+                for (i in 1..7) {
+                    if (x + i * coefficientX in 0..7 && y + i * coefficientY in 0..7) {
+                        val cell = board[x + i * coefficientX][y + i * coefficientY]
+                        if (cell.colour !in baseColours) {
+                            array += Pair(x + i * coefficientX, y + i * coefficientY)
+                        } else break
+                    }
+                }
+            }
+        }
+        return array
+    }
+
     fun canMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
         return if (isQueen) queenMove(board)
         else defaultMove(board)
@@ -63,31 +82,6 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
                                 board[x + coefficientX * 2][y + 2 * coefficientY].colour == Colour.GREEN
                             ) array += Pair(x + coefficientX * 2, y + 2 * coefficientY)
                         }
-                    }
-                }
-            }
-        }
-        return array
-    }
-
-    fun canAttack(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
-        return if (isQueen) queenAttack(board)
-        else defaultAttack(board)
-    }
-
-
-    private fun queenMove(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
-        var array = arrayOf<Pair<Int, Int>>()
-        val coefficient = listOf(1, -1)
-
-        for (coefficientX in coefficient) {
-            for (coefficientY in coefficient) {
-                for (i in 1..7) {
-                    if (x + i * coefficientX in 0..7 && y + i * coefficientY in 0..7) {
-                        val cell = board[x + i * coefficientX][y + i * coefficientY]
-                        if (cell.colour !in baseColours) {
-                            array += Pair(x + i * coefficientX, y + i * coefficientY)
-                        } else break
                     }
                 }
             }
@@ -123,5 +117,10 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
             }
         }
         return array
+    }
+
+    fun canAttack(board: Array<Array<Checker>>): Array<Pair<Int, Int>> {
+        return if (isQueen) queenAttack(board)
+        else defaultAttack(board)
     }
 }
