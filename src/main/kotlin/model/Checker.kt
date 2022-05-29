@@ -88,7 +88,7 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
         return array
     }
 
-    fun queenAttack(board: Array<Checker>): Array<Pair<Int, Int>> {
+    private fun queenAttack(board: Array<Checker>): Array<Pair<Int, Int>> {
         var array = arrayOf<Pair<Int, Int>>()
         val coefficient = listOf(1, -1)
 

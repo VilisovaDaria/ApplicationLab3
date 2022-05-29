@@ -31,19 +31,8 @@ class App : Application() {
             gc.drawImage(background, 0.0, 0.0)
             gc.drawImage(restart, 10.0, 10.0)
             gc.drawImage(exit, 620.0, 10.0)
-            for (cell in controller.getBoard()){
-                if (cell.colour != null) {
-                        val image = if (cell.isQueen) {
-                            when (cell.colour!!.image) {
-                                white -> whiteQueen
-                                black -> blackQueen
-                                else -> cell.colour!!.image
-                            }
-                        } else cell.colour!!.image
-                        val y = (cell.y + 1) * 70
-                        val x = 70 * (cell.x + 1)
-                        gc.drawImage(image, x.toDouble(), y.toDouble())
-                    }
+            for ((image, x, y) in controller.getSourcesToRepaint()) {
+                gc.drawImage(image, x, y)
             }
         }
 
@@ -52,7 +41,7 @@ class App : Application() {
                 controller.clickOnMouse(event.sceneX, event.sceneY)
 
                 val winImage = controller.whoDidWin()
-                if (winImage != null){
+                if (winImage != null) {
                     gc.drawImage(winImage, 0.0, 0.0)
                     gc.drawImage(restart, 0.0, 0.0)
                     gc.drawImage(exit, 630.0, 0.0)
