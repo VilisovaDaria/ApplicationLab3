@@ -43,25 +43,16 @@ class Controller {
         return sources
     }
 
-    private fun exit(x: Double, y: Double) {
-        if (x in 620.0..690.0 && y in 10.0..50.0) exitProcess(0)
-    }
-
-    private fun restart(x: Double, y: Double) {
-        if (x in 10.0..80.0 && y in 10.0..50.0) {
-            countBlack = 12
-            countWhite = 12
-            game = true
-            board = Board()
-            board.fillBoard()
-            readyChecker = Checker(notReady, notReady, Colour.WHITE)
-        }
+    fun restart() {
+        countBlack = 12
+        countWhite = 12
+        game = true
+        board = Board()
+        board.fillBoard()
+        readyChecker = Checker(notReady, notReady, Colour.WHITE)
     }
 
     fun clickOnMouse(coordinateX: Double, coordinateY: Double) {
-        exit(coordinateX, coordinateY)
-        restart(coordinateX, coordinateY)
-
         val (x, y) = getCellFromClick(coordinateX, coordinateY)
 
         if (game) {
