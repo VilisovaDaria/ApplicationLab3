@@ -1,3 +1,5 @@
+package workWithResourses
+
 import javafx.scene.image.Image
 import java.io.FileInputStream
 import java.nio.file.Paths
