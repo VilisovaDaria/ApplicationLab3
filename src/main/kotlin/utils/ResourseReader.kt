@@ -1,19 +1,13 @@
-package workWithResourses
+package utils
 
+import com.sun.javafx.scene.control.skin.Utils.getResource
 import javafx.scene.image.Image
 import java.io.FileInputStream
 import java.nio.file.Paths
 
-class ResourceReader {
-    fun pathResource(fileName: String): String {
-        val uri = this.javaClass.getResource("/$fileName")!!.toURI()
-        return Paths.get(uri).toString()
-    }
-}
-
 fun getImage(fileName: String,height: Double, width: Double): Image {
-    val reader = ResourceReader()
-    return Image(FileInputStream(reader.pathResource(fileName)), height, width, false, true)
+    val path = Paths.get(getResource("/$fileName")!!.toURI()).toString()
+    return Image(FileInputStream(path), height, width, false, true)
 }
 
 val black = getImage("chessBlack.png", 70.0, 70.0)

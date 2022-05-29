@@ -1,7 +1,7 @@
 package model
 
 import javafx.scene.image.Image
-import workWithResourses.*
+import utils.*
 
 enum class Colour(var image: Image) {
     BLACK(black),

@@ -1,6 +1,6 @@
 package view
 
-import workWithResourses.*
+import utils.*
 import controller.Controller
 import controller.notReady
 import javafx.application.Application

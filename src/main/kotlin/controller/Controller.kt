@@ -3,7 +3,7 @@ package controller
 import model.Checker
 import model.Colour
 import model.Board
-import workWithResourses.*
+import utils.*
 import javafx.scene.image.Image
 import kotlin.system.exitProcess
 
@@ -67,7 +67,7 @@ class Controller {
                     val checkerCanAttack = checkerInfo.first
                     val cellsCanMove = checkerInfo.second
 
-                    if (cell == checkerCanAttack) actionReady(cell, cellsCanMove)
+                    if (cell == checkerCanAttack) isActionReady(cell, cellsCanMove)
                     else if (cell.colour == Colour.GREEN) {
 
                         if (readyChecker.colour == Colour.WHITE) countBlack--
@@ -81,7 +81,7 @@ class Controller {
                 if (cell.colour != Colour.GREEN) {
                     if (attackColour == cell.colour) {
                         val cellsCanMove = cell.canMove(getBoard())
-                        if (cellsCanMove.isNotEmpty()) actionReady(cell, cellsCanMove)
+                        if (cellsCanMove.isNotEmpty()) isActionReady(cell, cellsCanMove)
                     }
                 } else {
                     board.changeColorInCells(readyChecker.canMove(getBoard()), null)
@@ -93,7 +93,7 @@ class Controller {
         }
     }
 
-    private fun actionReady(
+    private fun isActionReady(
         selectedCell: Checker,
         moves: Array<Pair<Int, Int>>,
     ) {
