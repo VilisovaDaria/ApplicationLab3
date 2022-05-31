@@ -122,4 +122,9 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
         return if (isQueen) queenAttack(board)
         else defaultAttack(board)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Checker) return false
+        return x == other.x && y == other.y && colour == other.colour && isQueen == other.isQueen
+    }
 }

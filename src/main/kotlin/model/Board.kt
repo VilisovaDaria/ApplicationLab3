@@ -1,8 +1,9 @@
 package model
 
-const val notReady = -1
 
 class Board(var cells: Array<Checker> = arrayOf()) {
+
+    private val notReady = -1
 
     private fun setColor(y: Int): Colour? {
         return when (y) {
@@ -16,7 +17,7 @@ class Board(var cells: Array<Checker> = arrayOf()) {
         return cells[x + y * 8]
     }
 
-    fun fillBoard() {
+    fun fillBoard(): Array<Checker> {
         for (cell in 0..63) {
             val x = cell % 8
             val y = cell / 8
@@ -24,6 +25,7 @@ class Board(var cells: Array<Checker> = arrayOf()) {
                 Checker(x, y, setColor(y))
             else Checker(x, y, null)
         }
+        return cells
     }
 
     fun eat(
@@ -58,10 +60,11 @@ class Board(var cells: Array<Checker> = arrayOf()) {
         return ready
     }
 
-    fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?) {
+    fun changeColorInCells(moves: Array<Pair<Int, Int>>, colour: Colour?): Array<Checker> {
         for ((x, y) in moves) {
             cells[x + y * 8].changeColour(colour)
         }
+        return cells
     }
 
     fun move(toCell: Checker, fromCell: Checker) {
@@ -73,7 +76,7 @@ class Board(var cells: Array<Checker> = arrayOf()) {
         isReadyToBeQueen(toCell)
     }
 
-    private fun isReadyToBeQueen(cell: Checker) {
+    fun isReadyToBeQueen(cell: Checker) {
         if (cell.y == 0 && cell.colour == Colour.BLACK) cell.changeRang(true)
         if (cell.y == 7 && cell.colour == Colour.WHITE) cell.changeRang(true)
     }
@@ -109,14 +112,10 @@ class Board(var cells: Array<Checker> = arrayOf()) {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as Board
-
-        if (!cells.contentEquals(other.cells)) return false
-
-        return true
+        return cells.contentEquals(other.cells)
     }
 
     override fun hashCode(): Int {
