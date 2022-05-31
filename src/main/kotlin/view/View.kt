@@ -37,7 +37,6 @@ open class App : Application() {
         buttonExit.layoutX = 610.0
         buttonExit.layoutY = 10.0
 
-
         root.children.add(buttonRestart)
         root.children.add(buttonExit)
 
