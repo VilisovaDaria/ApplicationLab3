@@ -49,8 +49,12 @@ class Tests {
     fun canAttack() {
         startBoard.cells[16].changeRang(true)
         startBoard.cells[25] = Checker(1, 3, Colour.BLACK, false)
+        startBoard.cells[43] = Checker(3, 5, null)
 
-        assertContentEquals(arrayOf(2 to 4), startBoard.cells[16].canAttack(startBoard.cells))
+        assertContentEquals(arrayOf(2 to 4, 3 to 5), startBoard.cells[16].canAttack(startBoard.cells))
+
+        startBoard.cells[29] = Checker(5, 3, Colour.BLACK, false)
+        assertContentEquals(arrayOf(4 to 4), startBoard.cells[22].canAttack(startBoard.cells))
     }
 
     @Test
