@@ -20,7 +20,7 @@ class Controller {
         board.fillBoard()
     }
 
-    fun getBoard(): Array<Checker> {
+    private fun getBoard(): Array<Checker> {
         return board.cells
     }
 
@@ -117,7 +117,7 @@ class Controller {
         return Pair(0, 0)
     }
 
-    fun whoDidWin(): Image? {
+    fun determineWinner(): Image? {
         return if (countWhite == 0) {
             game = false
             blackWin

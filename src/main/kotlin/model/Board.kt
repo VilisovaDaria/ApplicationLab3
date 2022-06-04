@@ -73,12 +73,7 @@ class Board(var cells: Array<Checker> = arrayOf()) {
         fromCell.changeColour(null) //меняю цвет старой клетки на null
         fromCell.changeRang(false)
 
-        isReadyToBeQueen(toCell)
-    }
-
-    fun isReadyToBeQueen(cell: Checker) {
-        if (cell.y == 0 && cell.colour == Colour.BLACK) cell.changeRang(true)
-        if (cell.y == 7 && cell.colour == Colour.WHITE) cell.changeRang(true)
+        toCell.isReadyToBeQueen()
     }
 
     fun canAttackAround(attackColour: Colour, board: Array<Checker>): Array<Pair<Checker, Array<Pair<Int, Int>>>> {

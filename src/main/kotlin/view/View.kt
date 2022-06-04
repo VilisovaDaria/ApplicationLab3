@@ -56,7 +56,7 @@ open class App : Application() {
             EventHandler { event ->
                 controller.clickOnMouse(event.sceneX, event.sceneY)
 
-                val winImage = controller.whoDidWin()
+                val winImage = controller.determineWinner()
                 if (winImage != null) {
                     gc.drawImage(winImage, 0.0, 0.0)
                 } else

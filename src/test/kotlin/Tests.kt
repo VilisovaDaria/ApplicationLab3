@@ -32,7 +32,7 @@ class Tests {
     @Test
     fun isReadyToBeQueen() {
         startBoard.cells[61] = Checker(5, 7, Colour.WHITE, false)
-        assertTrue(startBoard.isReadyToBeQueen(startBoard.cells[61]) == startBoard.cells[61].changeRang(true))
+        assertTrue(startBoard.cells[61].isReadyToBeQueen() == startBoard.cells[61].changeRang(true))
     }
 
 

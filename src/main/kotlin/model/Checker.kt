@@ -26,6 +26,11 @@ class Checker(var x: Int, var y: Int, var colour: Colour?, var isQueen: Boolean 
         isQueen = newRang
     }
 
+    fun isReadyToBeQueen() {
+        if (y == 0 && colour == Colour.BLACK) changeRang(true)
+        if (y == 7 && colour == Colour.WHITE) changeRang(true)
+    }
+
     private fun defaultMove(board: Array<Checker>): Array<Pair<Int, Int>> {
         var y = this.y
         var array = arrayOf<Pair<Int, Int>>()
